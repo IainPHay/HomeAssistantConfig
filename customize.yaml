@@ -1,0 +1,86 @@
+sensor.420d_remaining_fuel:
+  unit_of_measurement: l
+sensor.heiman_door_sensor_hs1dsz_access_control_3:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_sourcenodeid_3:
+  hidden: true
+sensor.alarm_level_3:
+  hidden: true
+sensor.alarm_type_3:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_burglar_3:
+  hidden: true
+sensor.door_sourcenodeid_3:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_access_control_4:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_sourcenodeid_4:
+  hidden: true
+sensor.alarm_level_4:
+  hidden: true
+sensor.alarm_type_4:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_burglar_4:
+  hidden: true
+sensor.door_sourcenodeid_4:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_access_control_2:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_sourcenodeid_2:
+  hidden: true
+sensor.alarm_level_2:
+  hidden: true
+sensor.alarm_type_2:
+  hidden: true
+sensor.heiman_door_sensor_hs1dsz_burglar_2:
+  hidden: true
+sensor.door_sourcenodeid_2:
+  hidden: true
+sensor.iains_iphone_battery_level:
+  hidden: true
+sensor.iains_iphone_battery_state_3:
+  hidden: true
+sensor.iains_iphone_battery_state_2:
+  hidden: true
+sensor.iains_iphone_battery_state:
+  hidden: true
+sensor.iains_iphone_battery_state_4:
+  hidden: true
+sensor.iains_iphone_battery_level_3:
+  hidden: true
+sensor.iains_iphone_battery_level_4:
+  hidden: true
+sensor.iains_iphone_battery_level_2:
+  hidden: true
+sensor.420d_mileage:
+  unit_of_measurement: m
+sensor.barney_dimmer:
+  hidden: true
+sensor.bedrooom_dimmer:
+  hidden: true
+sensor.hive_hub_status:
+  hidden: true
+sensor.pihole_ads_blocked_today:
+  hidden: true
+sensor.pihole_domains_blocked:
+  hidden: true
+sensor.pihole_dns_unique_domains:
+  hidden: true
+sensor.pihole_dns_queries_today:
+  hidden: true
+sensor.pihole_dns_queries_forwarded:
+  hidden: true
+sensor.pihole_dns_queries_cached:
+  hidden: true
+sensor.living_room_remote_control:
+  hidden: true
+sensor.hub_status:
+  hidden: true
+sensor.kitchenpir_alarm_level:
+  hidden: true
+sensor.kitchenpir_burglar:
+  hidden: true
+sensor.kitchenpir_sourcenodeid:
+  hidden: true
+sensor.kitchenpir_alarm_type:
+  hidden: true

@@ -1,0 +1,19 @@
+#pihole:
+#  name: Pi Hole Status
+#  entities:
+#    - sensor.pihole_status
+#    - script.enable_pihole
+#    - input_select.pihole_time
+#    - sensor.pihole_ads_blocked_today
+#    - sensor.pihole_ads_percentage_blocked_today
+#    - sensor.pihole_dns_queries_cached
+#    - sensor.pihole_dns_queries_forwarded
+#    - sensor.pihole_dns_queries_today
+#    - sensor.pihole_dns_unique_clients
+#    - sensor.pihole_dns_unique_domains
+#    - sensor.pihole_domains_blocked
+#Kitchen
+  Kitchen:
+    - light.kitchencounter
+    - light.sink
+    - light.breakfastbar

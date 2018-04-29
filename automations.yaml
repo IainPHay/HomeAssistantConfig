@@ -1,0 +1,88 @@
+#- alias: 'Christmas Outside Lights'
+#  trigger:
+#    platform: sun
+#    event: sunset
+#  action:
+#    - service: light.turn_on
+#      entity_id: light.christmas
+
+### turn Hall light sonoff on when door opened active from 1 hour before sunset
+- alias: 'Hall Light on'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
+      from: '23'
+      to: '22'
+  condition:
+    - condition: sun
+      after: 'sunset'
+      after_offset: "-1:00:00"
+  action:
+    - service: light.turn_on
+      entity_id: light.hall
+      
+### turn Hall light sonoff off when door has been shut for a total of 3 minutes
+- alias: 'Hall Light off'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
+      from: '22'
+      to: '23'
+      for:
+        minutes: 3
+  action:
+    - service: light.turn_off
+      entity_id: light.hall
+      
+- alias: 'Loft Light on'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
+      from: '23'
+      to: '22'
+  action:
+    - service: light.turn_on
+      entity_id: light.loft_light
+      
+- alias: 'Loft Light off'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
+      from: '22'
+      to: '23'
+  action:
+    - service: light.turn_off
+      entity_id: light.loft_light
+
+- alias: 'Kitchen Light off'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.kitchenpir_burglar
+      from: '8'
+      to: '0'
+      for:
+        minutes: 3 
+  action:
+    - service: light.turn_off
+      entity_id: group.kitchen
+ 
+- alias: 'Kitchen Light on'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.kitchenpir_burglar
+      from: '0'
+      to: '8'
+  condition:
+    - condition: sun
+      after: 'sunset'
+      after_offset: "-1:00:00"  
+  action:
+    - service: light.turn_on
+      entity_id: group.kitchen
+

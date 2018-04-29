@@ -1,0 +1,11 @@
+*
+!*.yaml
+!scenes
+!.gitignore
+secrets.yaml
+known_devices.yaml
+dropbox.py
+dropbox_uploader.sh
+home-assistant_v2.db
+home-assistant.log
+zones.yaml

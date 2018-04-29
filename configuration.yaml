@@ -1,0 +1,183 @@
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: 12
+  unit_system: metric
+  time_zone: Europe/London
+  customize: !include customize.yaml
+
+# Show links to resources in log and frontend
+# introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+http:
+  # Secrets are defined in the file secrets.yaml
+  api_password: !secret http_password
+  ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
+  ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
+  base_url: demig.duckdns.org:8123
+
+# Checks for available updates
+updater:
+  include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+   
+ios:
+
+emulated_hue:
+  host_ip: 192.168.1.31
+  expose_by_default: false
+ 
+# zwave
+zwave:
+  usb_path: /dev/zwave
+
+device_tracker:
+  - platform: owntracks
+    max_gps_accuracy: 200
+    mqtt_topic: "owntracks/#"
+
+# Local mqtt
+
+mqtt:
+  broker: 192.168.10.31
+  port: 1883
+  username: !secret mqqt_user
+  password: !secret mqqt_password
+  birth_message:
+    topic: "tele/hass1/LWT"
+    payload: "Online"
+    qos: 1
+    retain: true
+  will_message:
+    topic: "tele/hass1/LWT"
+    payload: "Offline"
+    qos: 1
+    retain: true
+
+light IainsLamp:
+  platform: mqtt
+  name: "IainsLamp"
+  state_topic: "stat/IainsLamp/POWER"
+  command_topic: "cmnd/IainsLamp/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+ 
+light KitchenCounter:
+  platform: mqtt
+  name: "KitchenCounter"
+  state_topic: "stat/KitchenCounter/POWER"
+  command_topic: "cmnd/KitchenCounter/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true 
+
+light OfficeLight:
+  platform: mqtt
+  name: "OfficeLight"
+  state_topic: "stat/OfficeLight/POWER"
+  command_topic: "cmnd/OfficeLight/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+
+light BreakfastBar:
+  platform: mqtt
+  name: "BreakfastBar"
+  state_topic: "stat/BreakfastBar/POWER"
+  command_topic: "cmnd/BreakfastBar/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  
+light Sink:
+  platform: mqtt
+  name: "Sink"
+  state_topic: "stat/Sink/POWER"
+  command_topic: "cmnd/Sink/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  
+light Hall:
+  platform: mqtt
+  name: "Hall"
+  state_topic: "stat/Hall/POWER"
+  command_topic: "cmnd/Hall/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+ 
+light LoftLight:
+  platform: mqtt
+  name: "Loft Light"
+  state_topic: "stat/LoftLight/POWER"
+  command_topic: "cmnd/LoftLight/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+
+hive:
+  username: !secret hive_user
+  password: !secret hive_password
+   
+bmw_connected_drive:
+  mycar:
+    username: !secret bmw_user
+    password: !secret bmw_password
+    region: "rest_of_world"
+
+
+# TV Sound
+media_player yamaha:
+  platform: yamaha
+  name: Yamaha
+  source_ignore:
+      - "HDMI2"
+      - "HDMI3"
+      - "HDMI6"
+  source_names:
+      HDMI1: "BT TV"
+      HDMI4: "Wii"
+      HDMI5: "FireTV"
+
+# Text to speech
+tts:
+  - platform: google
+
+group: !include groups.yaml
+sensor: !include sensors.yaml
+zone: !include zones.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml

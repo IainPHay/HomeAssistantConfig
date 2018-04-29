@@ -1,0 +1,66 @@
+### sensors.yaml
+
+# Pi-Hole component
+  - sensor pihole:
+    platform: pi_hole
+    host: 192.168.10.71
+
+# DarkSky hyper local weather
+
+  - sensor darksky:
+    platform: darksky
+    api_key: !secret darksky_api
+    monitored_conditions:
+      - summary
+      - icon
+      - precip_type
+      - precip_intensity
+      - precip_probability
+      - temperature
+      - daily_summary
+      - temperature_max
+
+# Monitor plant Kaffir Lime
+  - sensor lime:
+    platform: miflora
+    mac: C4:7C:8D:65:5F:47
+    name: Lime
+    median: 3
+    monitored_conditions:
+      - temperature
+      - moisture
+      - light
+      - conductivity
+
+# Monitor downstairs plant
+  - sensor livingroomplant:
+    platform: miflora
+    mac: C4:7C:8D:65:55:8D
+    name: DownstairPlant
+    median: 3
+    monitored_conditions:
+      - temperature
+      - moisture
+      - light
+      - conductivity
+
+# Weather prediction
+  - sensor weather:
+    platform: yr
+
+# Google geocode
+  - sensor address:
+    platform: google_geocode
+    name: Iain
+    origin: device_tracker.iosih
+    options: street, city
+    display_zone: hide
+    api_key: !secret google_geocode_api
+
+  - sensor abbiaddresss:
+    platform: google_geocode
+    name: Abbi
+    origin: device_tracker.abbi
+    options: street, city
+    display_zone: hide
+    api_key: !secret google_geocode_api
