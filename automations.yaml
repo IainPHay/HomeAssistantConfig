@@ -17,7 +17,7 @@
   condition:
     - condition: sun
       after: 'sunset'
-      after_offset: "-1:00:00"
+#      after_offset: "-1:00:00"
   action:
     - service: light.turn_on
       entity_id: light.hall
@@ -31,11 +31,14 @@
       from: '22'
       to: '23'
       for:
-        minutes: 3
+        minutes: 5
   action:
     - service: light.turn_off
       entity_id: light.hall
-      
+#
+### Loft Lights
+#
+# Loft light on when loft hatch opens triggering zwave sensor
 - alias: 'Loft Light on'
   hide_entity: True
   trigger:
@@ -46,7 +49,7 @@
   action:
     - service: light.turn_on
       entity_id: light.loft_light
-      
+# Loft light off when loft hatch closes triggering zwave sensor   
 - alias: 'Loft Light off'
   hide_entity: True
   trigger:
@@ -57,7 +60,9 @@
   action:
     - service: light.turn_off
       entity_id: light.loft_light
-
+#
+### Kitchen undercupboard lights triggered by zwave pir sensor
+#
 - alias: 'Kitchen Light off'
   hide_entity: True
   trigger:
@@ -70,7 +75,7 @@
   action:
     - service: light.turn_off
       entity_id: group.kitchen
- 
+# Kitchen under cupboard lights on if zwave PIR triggered after sunset 
 - alias: 'Kitchen Light on'
   hide_entity: True
   trigger:
@@ -81,7 +86,7 @@
   condition:
     - condition: sun
       after: 'sunset'
-      after_offset: "-1:00:00"  
+      after_offset: "-00:30:00"  
   action:
     - service: light.turn_on
       entity_id: group.kitchen
