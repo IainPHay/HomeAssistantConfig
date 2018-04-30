@@ -157,7 +157,18 @@ bmw_connected_drive:
     username: !secret bmw_user
     password: !secret bmw_password
     region: "rest_of_world"
-
+#
+### Plant component to amalgamate miflora readings
+#
+plant:
+  KaffirLime:
+    sensors:
+      moisture: sensor.lime_moisture
+      temperature: sensor.lime_temperature
+      conductivity: sensor.lime_conductivity
+      brightness: sensor.lime_light_intensity
+    min_moisture: 35
+    min_conductivity: 800
 
 # TV Sound
 media_player yamaha:
