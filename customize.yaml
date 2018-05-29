@@ -12,8 +12,7 @@ sensor.heiman_door_sensor_hs1dsz_burglar_3:
   hidden: true
 sensor.door_sourcenodeid_3:
   hidden: true
-sensor.heiman_door_sensor_hs1dsz_access_control_4:
-  hidden: true
+sensor.heiman_door_sensor_hs1dsz_access_control_4: {}
 sensor.heiman_door_sensor_hs1dsz_sourcenodeid_4:
   hidden: true
 sensor.alarm_level_4:
@@ -84,3 +83,5 @@ sensor.kitchenpir_sourcenodeid:
   hidden: true
 sensor.kitchenpir_alarm_type:
   hidden: true
+automation.loft_light_on: {}
+automation.loft_light_off: {}

@@ -61,6 +61,31 @@
     - service: light.turn_off
       entity_id: light.loft_light
 #
+### Garage Strip Light
+#
+# Garage Strip light on when garage internal door opens triggering zwave sensor
+- alias: 'Garage Strip Light on'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
+      from: '23'
+      to: '22'
+  action:
+    - service: light.turn_on
+      entity_id: light.GarageStrip
+# Garage strip light off when internal Garage door closes triggering zwave sensor   
+- alias: 'Garage Strip Light off'
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
+      from: '22'
+      to: '23'
+  action:
+    - service: light.turn_off
+      entity_id: light.GarageStrip
+#
 ### Kitchen undercupboard lights triggered by zwave pir sensor
 #
 - alias: 'Kitchen Light off'
@@ -71,7 +96,7 @@
       from: '8'
       to: '0'
       for:
-        minutes: 3 
+        minutes: 5 
   action:
     - service: light.turn_off
       entity_id: group.kitchen

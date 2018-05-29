@@ -33,6 +33,9 @@ discovery:
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
 
+#logentries:
+#  token: b9aeee09-97c7-4787-90b3-9c83138e240a
+
 # Enables support for tracking state changes over time
 history:
 
@@ -54,7 +57,13 @@ emulated_hue:
 # zwave
 zwave:
   usb_path: /dev/zwave
-
+  
+panel_iframe:
+ nodered:
+   title: 'Node-Red'
+   icon: 'mdi:shuffle-variant'
+   url: 'http://192.168.10.31:1880/'
+   
 device_tracker:
   - platform: owntracks
     max_gps_accuracy: 200
@@ -86,6 +95,7 @@ light IainsLamp:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
  
 light KitchenCounter:
@@ -96,6 +106,7 @@ light KitchenCounter:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true 
 
 light OfficeLight:
@@ -106,6 +117,7 @@ light OfficeLight:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
 
 light BreakfastBar:
@@ -116,6 +128,7 @@ light BreakfastBar:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
   
 light Sink:
@@ -126,6 +139,7 @@ light Sink:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
   
 light Hall:
@@ -136,6 +150,7 @@ light Hall:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
  
 light LoftLight:
@@ -146,6 +161,7 @@ light LoftLight:
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_not_available: "Offline"
   retain: true
 
 hive:

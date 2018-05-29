@@ -60,7 +60,7 @@
   - sensor abbiaddresss:
     platform: google_geocode
     name: Abbi
-    origin: device_tracker.abbi
+    origin: device_tracker.abbi_abbiphone
     options: street, city
     display_zone: hide
     api_key: !secret google_geocode_api
