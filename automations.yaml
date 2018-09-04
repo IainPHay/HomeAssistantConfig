@@ -40,7 +40,7 @@
 #
 # Loft light on when loft hatch opens triggering zwave sensor
 - alias: 'Loft Light on'
-  hide_entity: True
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
@@ -51,7 +51,7 @@
       entity_id: light.loft_light
 # Loft light off when loft hatch closes triggering zwave sensor   
 - alias: 'Loft Light off'
-  hide_entity: True
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
@@ -73,7 +73,7 @@
       to: '22'
   action:
     - service: light.turn_on
-      entity_id: light.GarageStrip
+      entity_id: light.Garage
 # Garage strip light off when internal Garage door closes triggering zwave sensor   
 - alias: 'Garage Strip Light off'
   hide_entity: True
@@ -84,7 +84,7 @@
       to: '23'
   action:
     - service: light.turn_off
-      entity_id: light.GarageStrip
+      entity_id: light.Garage
 #
 ### Kitchen undercupboard lights triggered by zwave pir sensor
 #

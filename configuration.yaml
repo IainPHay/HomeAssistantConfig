@@ -17,10 +17,9 @@ frontend:
 config:
 
 http:
-  # Secrets are defined in the file secrets.yaml
   api_password: !secret http_password
-  ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
-  ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
+#  ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
+#  ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
   base_url: demig.duckdns.org:8123
 
 # Checks for available updates
@@ -41,6 +40,8 @@ history:
 
 # View all events in a logbook
 logbook:
+
+logger:
 
 # Enables a map showing the location of tracked devices
 map:
@@ -158,6 +159,17 @@ light LoftLight:
   name: "Loft Light"
   state_topic: "stat/LoftLight/POWER"
   command_topic: "cmnd/LoftLight/POWER"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_not_available: "Offline"
+  retain: true
+  
+light GarageStrip:
+  platform: mqtt
+  name: "Garage Strip"
+  state_topic: "stat/Garage/POWER"
+  command_topic: "cmnd/Garage/POWER"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"

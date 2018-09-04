@@ -64,3 +64,7 @@
     options: street, city
     display_zone: hide
     api_key: !secret google_geocode_api
+
+# Certificate Expiry:
+  - platform: cert_expiry
+    host: demig.duckdns.org
