@@ -17,3 +17,41 @@
     - light.kitchencounter
     - light.sink
     - light.breakfastbar
+# Washer
+  Washing Machine:
+    - sensor.Washer_State
+    - sensor.washer_amps
+    - sensor.washer_voltage
+    - sensor.washer_power
+    - sensor.washer_amps
+    - sensor.washer_energy_today
+    - sensor.washer_energy_yesterday
+    - sensor.washer_signal
+    - switch.sonoffpow
+    
+#
+#BMW
+#
+  BMW:
+    - binary_sensor.420d_check_control_messages
+    - binary_sensor.420d_condition_based_services
+    - binary_sensor.420d_door_lock_state
+    - binary_sensor.420d_lids
+    - binary_sensor.420d_lights_parking
+    - binary_sensor.420d_windows
+    - lock.420d_lock
+    - sensor.420d_mileage
+    - sensor.420d_remaining_fuel
+    - sensor.420d_remaining_range_fuel
+    - sensor.420d_remaining_range_total
+    
+    
+#Next Bus
+#
+  BUS:
+    - sensor.next_bus_direction
+    - sensor.next_bus_to_newcastle
+    - sensor.next_bus_scheduled
+    - sensor.next_bus_estimated
+    - sensor.next_bus_route
+    

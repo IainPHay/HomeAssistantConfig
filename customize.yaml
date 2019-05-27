@@ -12,7 +12,8 @@ sensor.heiman_door_sensor_hs1dsz_burglar_3:
   hidden: true
 sensor.door_sourcenodeid_3:
   hidden: true
-sensor.heiman_door_sensor_hs1dsz_access_control_4: {}
+sensor.heiman_door_sensor_hs1dsz_access_control_4:
+  hidden: true
 sensor.heiman_door_sensor_hs1dsz_sourcenodeid_4:
   hidden: true
 sensor.alarm_level_4:
@@ -34,22 +35,6 @@ sensor.alarm_type_2:
 sensor.heiman_door_sensor_hs1dsz_burglar_2:
   hidden: true
 sensor.door_sourcenodeid_2:
-  hidden: true
-sensor.iains_iphone_battery_level:
-  hidden: true
-sensor.iains_iphone_battery_state_3:
-  hidden: true
-sensor.iains_iphone_battery_state_2:
-  hidden: true
-sensor.iains_iphone_battery_state:
-  hidden: true
-sensor.iains_iphone_battery_state_4:
-  hidden: true
-sensor.iains_iphone_battery_level_3:
-  hidden: true
-sensor.iains_iphone_battery_level_4:
-  hidden: true
-sensor.iains_iphone_battery_level_2:
   hidden: true
 sensor.420d_mileage:
   unit_of_measurement: m
@@ -85,3 +70,42 @@ sensor.kitchenpir_alarm_type:
   hidden: true
 automation.loft_light_on: {}
 automation.loft_light_off: {}
+sensor.abbi:
+  hidden: true
+device_tracker.abbi_otah:
+  hidden: true
+zone.home:
+  beacon:
+    uuid: EBEFD083-70A2-47C8-9837-E7B5634DF524
+    major: 8234
+    minor: 11403
+device_tracker.amazon163295af6:
+  hidden: true
+device_tracker.toshz30b04:
+  friendly_name: IainLaptop
+sensor.shire3d_actual_tool0_temp:
+  friendly_name: Shire3D Nozzle Temp
+sensor.washer_amps:
+  hidden: true
+sensor.washer_voltage:
+  hidden: true
+sensor.washer_signal:
+  hidden: true
+media_player.iains_fire_tv_stick:
+  hidden: true
+media_player.iains_fire_tablet:
+  hidden: true
+media_player.iains_alexa_apps:
+  hidden: true
+media_player.abigails_alexa_apps:
+  hidden: true
+media_player.abbis_fire:
+  hidden: true
+media_player.this_device:
+  hidden: true
+media_player.this_device_2:
+  hidden: true
+media_player.iains_echo_dot:
+  hidden: true
+media_player.lounge:
+  hidden: true

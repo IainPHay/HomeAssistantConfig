@@ -6,6 +6,13 @@ homeassistant:
   unit_system: metric
   time_zone: Europe/London
   customize: !include customize.yaml
+  auth_providers:
+    - type: trusted_networks
+      trusted_networks:
+        - 127.0.0.1
+        - 192.168.10.0/24
+    - type: legacy_api_password
+      api_password: !secret http_password
 
 # Show links to resources in log and frontend
 # introduction:
@@ -16,11 +23,36 @@ frontend:
 # Enables configuration UI
 config:
 
+#Automatically update custom components if they support it
+custom_updater:
+  component_urls:
+    - https://raw.githubusercontent.com/keatontaylor/alexa_media_player/master/custom_components.json
+
 http:
-  api_password: !secret http_password
-#  ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
-#  ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
+#  api_password: !secret http_password
+  ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
+  ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
   base_url: demig.duckdns.org:8123
+#  trusted_networks:
+
+mobile_app:
+
+#Display ShireBrew in Hass - not working needs work
+camera:
+  platform: generic
+  still_image_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEdfhSUFm2MKj1cDbX6HKDHEKzbSpBbaeYP_4rb83_bMIjJOj3d4WRUV6bBgfbBJ093iUg1q5mhxV/pubchart?oid=1890832659&format=image
+  name: "ShireBrew"  
+
+
+# Alexa integration for announcements etc
+alexa_media:
+  accounts:
+    - email: iain@demig.co.uk
+      password: Jupiter562589
+      url: amazon.co.uk
+
+# Displays network speed test      
+speedtestdotnet:
 
 # Checks for available updates
 updater:
@@ -30,7 +62,18 @@ updater:
 discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
-conversation:
+#conversation:
+
+notify:
+  platform: alexa_media
+  name: alexa_media
+
+#  - name: iainabbi
+  #  platform: group
+ #   services:
+ #     - service: ios_iosih
+ #     - service: ios_abbiios
+
 
 #logentries:
 #  token: b9aeee09-97c7-4787-90b3-9c83138e240a
@@ -40,6 +83,8 @@ history:
 
 # View all events in a logbook
 logbook:
+
+system_health:
 
 logger:
 
@@ -51,27 +96,41 @@ sun:
    
 ios:
 
-emulated_hue:
-  host_ip: 192.168.1.31
-  expose_by_default: false
- 
+#emulated_hue:
+#  host_ip: 192.168.1.31
+#  expose_by_default: false
+  
+octoprint:
+  host: 192.168.10.10
+  api_key: 321E4FCFC6CD4EE1901F3539773B4B7F
+  name: Shire3D
+  bed: true
+  number_of_tools: 1
+  
+# 3D Printer Camera not working needs work
+#camera:
+#  - platform: mjpeg
+#    name: OctoPrint
+#    still_image_url: http://192.168.10.28/webcam/?action=snapshot
+#    mjpeg_url: http://192.168.10.28/webcam/?action=stream
+
 # zwave
 zwave:
   usb_path: /dev/zwave
-  
-panel_iframe:
- nodered:
-   title: 'Node-Red'
-   icon: 'mdi:shuffle-variant'
-   url: 'http://192.168.10.31:1880/'
+
+#panel_iframe: not workign needs work
+#  nodered:
+#   title: 'Node-Red'
+#   icon: 'mdi:shuffle-variant'
+#   url: 'https
+#   ://192.168.10.31:1880/'
    
 device_tracker:
-  - platform: owntracks
-    max_gps_accuracy: 200
-    mqtt_topic: "owntracks/#"
+#  - platform: owntracks
+#    max_gps_accuracy: 200
+#    mqtt_topic: "owntracks/#"
 
-# Local mqtt
-
+# Local mqtt - Mosquitto on HomeAssistant pi
 mqtt:
   broker: 192.168.10.31
   port: 1883
@@ -88,93 +147,149 @@ mqtt:
     qos: 1
     retain: true
 
-light IainsLamp:
-  platform: mqtt
-  name: "IainsLamp"
-  state_topic: "stat/IainsLamp/POWER"
-  command_topic: "cmnd/IainsLamp/POWER"
-  qos: 1
-  payload_on: "ON"
-  payload_off: "OFF"
-  payload_not_available: "Offline"
-  retain: true
- 
-light KitchenCounter:
-  platform: mqtt
-  name: "KitchenCounter"
-  state_topic: "stat/KitchenCounter/POWER"
-  command_topic: "cmnd/KitchenCounter/POWER"
-  qos: 1
-  payload_on: "ON"
-  payload_off: "OFF"
-  payload_not_available: "Offline"
-  retain: true 
+### House Lights
+#
+#Office light Tasmota - Basic Sonoff
+#light:
+
+#  platform: switch
+#  name: Office
+#  entity_id: switch.office_2
 
 light OfficeLight:
   platform: mqtt
-  name: "OfficeLight"
-  state_topic: "stat/OfficeLight/POWER"
-  command_topic: "cmnd/OfficeLight/POWER"
+  name: "Office"
+  state_topic: "stat/Office/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/Office/POWER"
+  availability_topic: "tele/Office/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
 
+# Iain's Bedside light Tasmota - TH10 plus humidity and temperature
+light IainsLamp:
+  platform: mqtt
+  name: "IainLamp"
+  state_topic: "stat/IainLamp/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/IainLamp/POWER"
+  availability_topic: "tele/IainLamp/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  
+# Kitchen Counter light Tasmota - Basic Sonoff
+light KitchenCounter:
+  platform: mqtt
+  name: "KitchenCounter"
+  state_topic: "stat/KitchenCounter/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/KitchenCounter/POWER"
+  availability_topic: "tele/KitchenCounter/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  
+# Breakfast Bar light Tasmota - Basic Sonoff
 light BreakfastBar:
   platform: mqtt
   name: "BreakfastBar"
-  state_topic: "stat/BreakfastBar/POWER"
+  state_topic: "stat/BreakfastBar/RESULT"
+  value_template: "{{ value_json.POWER }}"
   command_topic: "cmnd/BreakfastBar/POWER"
+  availability_topic: "tele/BreakfastBar/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
   
+# Sink light Tasmota - Basic Sonoff
 light Sink:
   platform: mqtt
   name: "Sink"
-  state_topic: "stat/Sink/POWER"
+  state_topic: "stat/Sink/RESULT"
+  value_template: "{{ value_json.POWER }}"
   command_topic: "cmnd/Sink/POWER"
+  availability_topic: "tele/Sink/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
   
+# Hall light Tasmota - Basic Sonoff 
 light Hall:
   platform: mqtt
   name: "Hall"
-  state_topic: "stat/Hall/POWER"
-  command_topic: "cmnd/Hall/POWER"
+  state_topic: "stat/HallLight/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/HallLight/POWER"
+  availability_topic: "tele/HallLight/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
  
-light LoftLight:
+# Loft light Tasmota - Basic Sonoff 
+light Loft:
   platform: mqtt
-  name: "Loft Light"
-  state_topic: "stat/LoftLight/POWER"
+  name: "Loft"
+  state_topic: "stat/LoftLight/RESULT"
+  value_template: "{{ value_json.POWER }}"
   command_topic: "cmnd/LoftLight/POWER"
+  availability_topic: "tele/LoftLight/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
+ 
+ # Garage Strip light Tasmota - Basic Sonoff 
 light GarageStrip:
   platform: mqtt
-  name: "Garage Strip"
-  state_topic: "stat/Garage/POWER"
+  name: "Garage"
+  state_topic: "stat/Garage/RESULT"
+  value_template: "{{ value_json.POWER }}"
   command_topic: "cmnd/Garage/POWER"
+  availability_topic: "tele/Garage/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
+  payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
+
+ # Fish tank Tasmota - S26 192.168.10.209  
+switch FishTank:
+  platform: mqtt
+  name: "FishTank"
+  state_topic: "stat/FishTank/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/FishTank/POWER"
+  availability_topic: "tele/FishTank/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+
 
 hive:
   username: !secret hive_user
@@ -199,21 +314,24 @@ plant:
     min_conductivity: 800
 
 # TV Sound
-media_player yamaha:
-  platform: yamaha
-  name: Yamaha
-  source_ignore:
-      - "HDMI2"
-      - "HDMI3"
-      - "HDMI6"
-  source_names:
-      HDMI1: "BT TV"
-      HDMI4: "Wii"
-      HDMI5: "FireTV"
+#media_player yamaha:
+#  platform: yamaha
+#  name: Yamaha
+#  source_ignore:
+#      - "HDMI2"
+#      - "HDMI3"
+#      - "HDMI6"
+#  source_names:
+#      HDMI1: "BT TV"
+#      HDMI4: "Wii"
+#      HDMI5: "FireTV"
 
-# Text to speech
+#Text to speech
 tts:
-  - platform: google
+  - platform: google_translate
+    service_name: google_say
+  
+  
 
 group: !include groups.yaml
 sensor: !include sensors.yaml

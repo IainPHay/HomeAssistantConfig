@@ -1,70 +1,244 @@
 ### sensors.yaml
 
 # Pi-Hole component
-  - sensor pihole:
-    platform: pi_hole
-    host: 192.168.10.71
+- platform: pi_hole
+  host: 192.168.10.71
 
 # DarkSky hyper local weather
 
-  - sensor darksky:
-    platform: darksky
-    api_key: !secret darksky_api
-    monitored_conditions:
-      - summary
-      - icon
-      - precip_type
-      - precip_intensity
-      - precip_probability
-      - temperature
-      - daily_summary
-      - temperature_max
+- platform: darksky
+  api_key: !secret darksky_api
+  monitored_conditions:
+    - summary
+    - icon
+    - precip_type
+    - precip_intensity
+    - precip_probability
+    - temperature
+    - daily_summary
+    - temperature_max
+      
+#~- platform: speedtest
+#~  server_id: 10602
+#  minute: 00
+#  hour:
+#    - 0
+#    - 6
+#    - 12
+#    - 18
+#  monitored_conditions:
+  #  - ping
+#    - download
+#    - upload
 
 # Monitor plant Kaffir Lime
-  - sensor lime:
-    platform: miflora
-    mac: C4:7C:8D:65:5F:47
-    name: Lime
-    median: 3
-    monitored_conditions:
-      - temperature
-      - moisture
-      - light
-      - conductivity
+- platform: miflora
+  mac: C4:7C:8D:65:5F:47
+  name: Lime
+  median: 3
+  monitored_conditions:
+    - temperature
+    - moisture
+    - light
+    - conductivity
 
 # Monitor downstairs plant
-  - sensor livingroomplant:
-    platform: miflora
-    mac: C4:7C:8D:65:55:8D
-    name: DownstairPlant
-    median: 3
-    monitored_conditions:
-      - temperature
-      - moisture
-      - light
-      - conductivity
+- platform: miflora
+  mac: C4:7C:8D:65:55:8D
+  name: DownstairPlant
+  median: 3
+  monitored_conditions:
+    - temperature
+    - moisture
+    - light
+    - conductivity
 
 # Weather prediction
-  - sensor weather:
-    platform: yr
+
+- platform: yr
 
 # Google geocode
-  - sensor address:
-    platform: google_geocode
-    name: Iain
-    origin: device_tracker.iosih
-    options: street, city
-    display_zone: hide
-    api_key: !secret google_geocode_api
+#
+#- platform: google_geocode
+#  name: Iain
+#  origin: device_tracker.iosih
+#  options: street, city
+#  display_zone: hide
+#  api_key: !secret google_geocode_api
 
-  - sensor abbiaddresss:
-    platform: google_geocode
-    name: Abbi
-    origin: device_tracker.abbi_abbiphone
-    options: street, city
-    display_zone: hide
-    api_key: !secret google_geocode_api
+#- platform: google_geocode
+#  name: Abbi
+#  origin: device_tracker.abbiios
+#  options: street, city
+#  display_zone: hide
+#  api_key: !secret google_geocode_api
+    
 
+#- platform: google_geocode
+#  name: Barney
+#  origin: device_tracker.barneyios
+#  options: street, city
+#  display_zone: hide
+#  api_key: !secret google_geocode_api
+    
 # Certificate Expiry:
-  - platform: cert_expiry
-    host: demig.duckdns.org
+ # - sensor CertExp:
+ #   platform: cert_expiry
+ #   host: demig.duckdns.org
+
+# Bedroom tasmota temperature
+#  - sensor:
+- platform: mqtt
+  name: "Bedroom Temp"
+  state_topic: "tele/IainLamp/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "tele/IainLamp/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+    
+# Bedroom tasmota humidity
+#  - sensor:
+- platform: mqtt
+  name: "Bedroom Humidity"
+  state_topic: "tele/IainLamp/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "tele/IainLamp/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+    
+# Christmas tasmota temperature
+ 
+- platform: mqtt
+  name: "Downstairs Temp"
+  state_topic: "tele/Christmas/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['AM2301'].Temperature }}"
+  availability_topic: "tele/Christmas/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+    
+# Christmas tasmota humidity
+
+- platform: mqtt
+  name: "Downstairs Humidity"
+  state_topic: "tele/Christmas/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['AM2301'].Humidity }}"
+  availability_topic: "tele/Christmas/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+
+# Tumble dryer power
+
+- platform: mqtt
+  name: "Washer State"
+  state_topic: "hass/state/washer"
+  icon: mdi:washing-machine
+
+
+- platform: mqtt
+  name: "Washer Power"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Power }}"
+  qos: 2
+  unit_of_measurement : "W"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+
+- platform: mqtt
+  name: "Washer Voltage"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Voltage }}"
+  qos: 2
+  unit_of_measurement : "V"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  
+
+- platform: mqtt
+  name: "Washer Amps"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Current }}"
+  qos: 2
+  unit_of_measurement : "A"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+    
+ 
+- platform: mqtt
+  name: "Washer Energy Today"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Today }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+    
+  
+- platform: mqtt
+  name: "Washer Energy Yesterday"
+  state_topic: "tele/SonoffWasher/SENSOR"
+  value_template: "{{value_json['ENERGY'].Yesterday }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/SonoffWasher/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+
+- platform: mqtt
+  state_topic: "tele/SonoffWasher/STATE"
+  name: "Washer Signal"
+  unit_of_measurement: "%"
+  value_template: "{{value_json['Wifi'].RSSI }}"
+  availability_topic: "tele/SonoffWasher/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+    
+# Uk Transport
+
+
+- platform: uk_transport
+  app_id: 88ca6b74
+  app_key: 258682558913e07176b986d2288fcf60
+  queries:
+    - mode: bus
+      origin: 3100Z199842
+      destination: Newcastle
+        
+ 
+- platform: template
+  sensors:
+    next_bus_route:
+      friendly_name: "Next bus route"
+      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].route}}"
+    next_bus_direction:
+      friendly_name: "Next bus direction"
+      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].direction}}"
+    next_bus_scheduled:
+      friendly_name: "Next bus scheduled"
+      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].scheduled}}"
+    next_bus_estimated:
+      friendly_name: "Next bus estimated"
+      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].estimated}}"
+
+# Octopi Time in Hrs and minutes
+
+
+- platform: waze_travel_time
+#  sensor:
+  origin: 55.153073, -1.692775
+  destination: 55.079867, -1.590591
+  region: 'EU'
+  name: "Abbi to work"

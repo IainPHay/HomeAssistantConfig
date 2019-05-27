@@ -1,28 +1,66 @@
-#- alias: 'Christmas Outside Lights'
-#  trigger:
-#    platform: sun
-#    event: sunset
-#  action:
-#    - service: light.turn_on
-#      entity_id: light.christmas
+# Get state of all sonoffs on startup
+- alias: 'Power state on HA start-up'
+  hide_entity: false
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - service: mqtt.publish
+      data:
+        topic: "cmnd/sonoffs/state"
+        payload: ""
+#        
+### Christmas Switch on
+#
 
-### turn Hall light sonoff on when door opened active from 1 hour before sunset
+# Switch on Christmas tree lights at sunset
+- alias: 'Christmas Tree Lights'
+  trigger:
+    platform: sun
+    event: sunset
+  action:
+    - service: switch.turn_on
+      entity_id: switch.christmas_2
+      
+#Switch on outside christmas tree lights at sunset
+- alias: 'Outside Christmas Tree Lights'
+  trigger:
+    platform: sun
+    event: sunset
+  action:
+    - service: switch.turn_on
+      entity_id: switch.shireoutfront
+#Switch on Christmas Candles at sunset
+- alias: 'Christmas Candles'
+  trigger:
+    platform: sun
+    event: sunset
+  action:
+    - service: switch.turn_on
+      entity_id: switch.christmascandles
+
+### turn Hall light sonoff on when door opened active from 1 hour before sunset or raining
 - alias: 'Hall Light on'
-  hide_entity: True
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
       from: '23'
       to: '22'
   condition:
-    - condition: sun
-      after: 'sunset'
-#      after_offset: "-1:00:00"
+    condition: or
+    conditions:
+      - condition: sun
+        after: 'sunset'
+        after_offset: "-1:00:00"
+      - condition: state
+        entity_id: sensor.dark_sky_precip
+        state: 'rain'
   action:
     - service: light.turn_on
       entity_id: light.hall
       
-### turn Hall light sonoff off when door has been shut for a total of 3 minutes
+### turn Hall light sonoff off when door has been shut for a total of 5 minutes
 - alias: 'Hall Light off'
   hide_entity: True
   trigger:
@@ -73,7 +111,7 @@
       to: '22'
   action:
     - service: light.turn_on
-      entity_id: light.Garage
+      entity_id: light.garage_strip
 # Garage strip light off when internal Garage door closes triggering zwave sensor   
 - alias: 'Garage Strip Light off'
   hide_entity: True
@@ -84,7 +122,7 @@
       to: '23'
   action:
     - service: light.turn_off
-      entity_id: light.Garage
+      entity_id: light.garage_strip
 #
 ### Kitchen undercupboard lights triggered by zwave pir sensor
 #
@@ -100,7 +138,7 @@
   action:
     - service: light.turn_off
       entity_id: group.kitchen
-# Kitchen under cupboard lights on if zwave PIR triggered after sunset 
+# Kitchen under cupboard lights on if zwave PIR triggered after sunset or raining 
 - alias: 'Kitchen Light on'
   hide_entity: True
   trigger:
@@ -109,10 +147,213 @@
       from: '0'
       to: '8'
   condition:
-    - condition: sun
-      after: 'sunset'
-      after_offset: "-00:30:00"  
+    condition: or
+    conditions:
+      - condition: sun
+        after: 'sunset'
+        after_offset: "-01:00:00"
+      - condition: state
+        entity_id: sensor.dark_sky_precip
+        state: 'rain'
   action:
     - service: light.turn_on
       entity_id: group.kitchen
 
+### Notify when Lime tree needs water
+#- alias: 'Lime needs water'
+#  hide_entity: false
+#  trigger:
+#    - platform: numeric_state
+#      entity_id: sensor.lime_moisture
+#      below: 40
+#  action:
+#    service: notify.ios_iosIH
+#    data:
+#      title: "Smart Home Alert"
+#      message: "Moisture below 40"
+#      data:
+#        subtitle: "Water Kaffir Lime"
+
+###Actions when Abbi leaves work
+- alias: 'Abbi Leaves Work'
+  hide_entity: false
+  trigger:
+    - platform: state
+      entity_id: device_tracker.abbiios
+      from: 'AbbiWork'
+      # Optional
+      #to: 'Away'
+#  action:
+#    - service: notify.ios_iosIH
+#      data:
+#        title: "Smart Home Alerts"
+#        message: "Abbi Location"
+#        data:
+#          subtitle: "Abbi has left work"
+  action:
+    - service: notify.alexa_media
+      data:
+        data:
+          type: announce
+        target:
+          - media_player.office
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.lounge
+          - media_player.bedroom
+        message: "Abbi has left work"
+ #   - service: notify.ios_iosIH
+ #     data:
+ #       title: "Smart Home Alerts"
+ #       message: "Put Kettle on!"
+ #       data:
+ #         subtitle: "Abbi home in 5 minutes"
+ 
+    - delay: '00:10:00'
+    - service: notify.alexa_media
+      data:
+        data:
+          type: announce
+        target:
+          - media_player.office
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.lounge
+          - media_player.bedroom
+        message: "Abbi will be home in five minutes put the kettle on!"
+  
+# Washer will need adjusting
+#
+#-
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#  Washing Machine Start/Finish
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+- alias: 'Washer State - Start'
+  hide_entity: false
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.Washer_Power
+      above: 10
+      for:
+        seconds: 20
+# Make sure washer isn't already running and delaying between cycles - don't re-trigger and cause stopwatch reset
+  condition:
+    condition: template
+    value_template: "{{ states.sensor.Washer_State.state != 'Washing' }}"
+  action:
+    service: mqtt.publish
+    data:
+      topic: hass/state/washer
+      payload: 'Washing'
+      retain: 'true'
+- alias: 'Washer State - Idle'
+  hide_entity: false
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.washer_Power
+      below: 5
+      for:
+        minutes: 5
+  action:
+    service: mqtt.publish
+    data:
+      topic: hass/state/washer
+      payload: 'Idle'
+      retain: 'true'
+
+
+- alias: 'Washer Finished'
+  trigger:
+    platform: state
+    entity_id: sensor.Washer_State
+    from: 'Washing'
+    to: 'Idle'
+  condition:
+    condition: time
+    after: '09:00:00'
+    before: '22:30:00'
+  
+#    condition: template
+#    value_template: "{{ states.sensor.dryer_state.state != 'Drying' }}"
+#  action:
+#    - service: media_player.volume_set
+#      data:
+#        entity_id:
+#          - media_player.office_speaker
+#        volume_level: '0.75'
+# Play to google home
+#        - service: tts.google_say
+#      entity_id:
+#        - media_player.office_speaker
+#      data_template:
+#        message: "Laundry in the washing machine is done!"
+#
+#    - service: notify.ios_iosIH
+#      data:
+#        title: "Smart Home Alerts"
+#        message: "It's ready for you!"
+#        data:
+#          subtitle: "Washing Machine has finished"
+#    - service: notify.ios_abbiios
+#      data:
+#        title: "Smart Home Alerts"
+#        message: "It's ready for you!"
+#        data:
+#          subtitle: "Washing Machine has finished"
+  action:
+    - service: notify.alexa_media
+      data:
+        data:
+          type: announce
+        target:
+          - media_player.office
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.lounge
+          - media_player.bedroom
+        message: "Laundry in the washing machine is done."
+   
+
+## Shire 3D print finished
+#
+- alias: '3D print Finished'
+  hide_entity: false
+  trigger:
+    - platform: state
+      entity_id: sensor.shire3d_current_state
+      from: 'Printing'
+      #to: 'Away'
+  action:
+#    - service: notify.ios_iosIH
+#      data:
+#        title: "Smart Home Alerts"
+#        message: "Shire 3D"
+#        data:
+#          subtitle: "Print has finished"
+#    - service: media_player.volume_set
+#      data:
+#        entity_id:
+#          - media_player.office_speaker
+#        volume_level: '0.75'
+#    - service: tts.google_say
+#      entity_id:
+#         - media_player.office_speaker
+#      data_template:
+#        message: "3D print has finished"
+
+    - service: notify.alexa_media
+      data:
+        data:
+          type: announce
+        target:
+          - media_player.office
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.lounge
+          - media_player.bedroom
+        message: "3D printer is finished."
+  
