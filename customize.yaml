@@ -12,16 +12,13 @@ sensor.heiman_door_sensor_hs1dsz_burglar_3:
   hidden: true
 sensor.door_sourcenodeid_3:
   hidden: true
-sensor.heiman_door_sensor_hs1dsz_access_control_4:
-  hidden: true
+sensor.heiman_door_sensor_hs1dsz_access_control_4: {}
 sensor.heiman_door_sensor_hs1dsz_sourcenodeid_4:
   hidden: true
-sensor.alarm_level_4:
-  hidden: true
+sensor.alarm_level_4: {}
 sensor.alarm_type_4:
   hidden: true
-sensor.heiman_door_sensor_hs1dsz_burglar_4:
-  hidden: true
+sensor.heiman_door_sensor_hs1dsz_burglar_4: {}
 sensor.door_sourcenodeid_4:
   hidden: true
 sensor.heiman_door_sensor_hs1dsz_access_control_2:
@@ -109,3 +106,5 @@ media_player.iains_echo_dot:
   hidden: true
 media_player.lounge:
   hidden: true
+sensor.dryer_state:
+  icon: mdi:tumble-dryer

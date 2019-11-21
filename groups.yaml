@@ -17,6 +17,7 @@
     - light.kitchencounter
     - light.sink
     - light.breakfastbar
+    - light.cooker
 # Washer
   Washing Machine:
     - sensor.Washer_State
@@ -27,8 +28,49 @@
     - sensor.washer_energy_today
     - sensor.washer_energy_yesterday
     - sensor.washer_signal
-    - switch.sonoffpow
+    - sensor.washer_apparentpower
+    - switch.washer
+
+# Dryer
+  Dryer:
+    - sensor.dryer_State
+    - sensor.dryer_amps
+    - sensor.dryer_voltage
+    - sensor.dryer_power
+    - sensor.dryer_amps
+    - sensor.dryer_energy_today
+    - sensor.dryer_energy_yesterday
+    - sensor.dryer_signal
+    - sensor.dryer_apparentpower
+    - switch.dryer
+#Garage
+  Garage:
+    - light.garagestrip
+    - light.garageflood
     
+#Bathroom
+  Bathroom:
+    - light.bathroom_1_2
+    - light.bathroom_2_2
+    - light.bathroom_3_2
+    - light.bathroom_4_2
+    - light.bathroom_5_2
+    - light.bathroom_6_2
+    
+# Internet
+  BTInternet:
+    - sensor.bt_home_hub_6_0a_bytes_received
+    - sensor.bt_home_hub_6_0a_bytes_sent
+    - sensor.bt_home_hub_6_0a_kbyte_sec_received
+    - sensor.bt_home_hub_6_0a_kbyte_sec_sent
+    - sensor.bt_home_hub_6_0a_packets_received
+    - sensor.bt_home_hub_6_0a_packets_sent
+    - sensor.bt_home_hub_6_0a_packets_sec_received
+    - sensor.bt_home_hub_6_0a_packets_sec_sent
+    
+# pi-hole
+ # Pi-Hole:
+ #   - sensor.Pi-Hole.Ads.Blocked.Today
 #
 #BMW
 #

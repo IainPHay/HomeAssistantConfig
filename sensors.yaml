@@ -3,6 +3,19 @@
 # Pi-Hole component
 - platform: pi_hole
   host: 192.168.10.71
+  monitored_conditions:
+      - ads_blocked_today
+      - ads_percentage_today
+      - dns_queries_today
+      - domains_being_blocked
+      - queries_cached
+      - queries_forwarded
+      - unique_clients
+      - unique_domains
+
+# Raspberry Pi Power monitor
+- platform: rpi_power
+  text_state: true      
 
 # DarkSky hyper local weather
 
@@ -53,9 +66,7 @@
     - light
     - conductivity
 
-# Weather prediction
 
-- platform: yr
 
 # Google geocode
 #
@@ -130,13 +141,12 @@
   payload_available: "Online"
   payload_not_available: "offline"
 
-# Tumble dryer power
+# Washer power
 
 - platform: mqtt
   name: "Washer State"
   state_topic: "hass/state/washer"
   icon: mdi:washing-machine
-
 
 - platform: mqtt
   name: "Washer Power"
@@ -149,7 +159,6 @@
   payload_available: "Online"
   payload_not_available: "Offline"
 
-
 - platform: mqtt
   name: "Washer Voltage"
   state_topic: "tele/Washer/SENSOR"
@@ -161,7 +170,6 @@
   payload_available: "Online"
   payload_not_available: "Offline"
   
-
 - platform: mqtt
   name: "Washer Amps"
   state_topic: "tele/Washer/SENSOR"
@@ -172,8 +180,7 @@
   availability_topic: "tele/Washer/LWT"
   payload_available: "Online"
   payload_not_available: "Offline"
-    
- 
+   
 - platform: mqtt
   name: "Washer Energy Today"
   state_topic: "tele/Washer/SENSOR"
@@ -183,29 +190,122 @@
   availability_topic: "tele/Washer/LWT"
   payload_available: "Online"
   payload_not_available: "Offline"
-    
-  
+      
 - platform: mqtt
   name: "Washer Energy Yesterday"
-  state_topic: "tele/SonoffWasher/SENSOR"
+  state_topic: "tele/Washer/SENSOR"
   value_template: "{{value_json['ENERGY'].Yesterday }}"
   qos: 2
   unit_of_measurement : "kWh"
-  availability_topic: "tele/SonoffWasher/LWT"
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+- platform: mqtt
+  state_topic: "tele/Washer/STATE"
+  name: "Washer Signal"
+  unit_of_measurement: "%"
+  value_template: "{{value_json['Wifi'].RSSI }}"
+  availability_topic: "tele/Washer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  
+- platform: mqtt
+  state_topic: "tele/Washer/SENSOR"
+  name: "Washer Apparent Power"
+  unit_of_measurement: "W"
+  value_template: "{{value_json['ENERGY'].ApparentPower }}"
+  availability_topic: "tele/Washer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"  
+  
+# Tumble dryer power
+
+- platform: mqtt
+  name: "Dryer State"
+  state_topic: "hass/state/dryer"
+  icon: mdi:washing-machine
+
+
+- platform: mqtt
+  name: "Dryer Power"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Power }}"
+  qos: 2
+  unit_of_measurement : "W"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
   payload_available: "Online"
   payload_not_available: "Offline"
 
 
 - platform: mqtt
-  state_topic: "tele/SonoffWasher/STATE"
-  name: "Washer Signal"
-  unit_of_measurement: "%"
-  value_template: "{{value_json['Wifi'].RSSI }}"
-  availability_topic: "tele/SonoffWasher/LWT"
-  qos: 1
+  name: "Dryer Voltage"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Voltage }}"
+  qos: 2
+  unit_of_measurement : "V"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  
+
+- platform: mqtt
+  name: "Dryer Amps"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Current }}"
+  qos: 2
+  unit_of_measurement : "A"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
   payload_available: "Online"
   payload_not_available: "Offline"
     
+ 
+- platform: mqtt
+  name: "Dryer Energy Today"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Today }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+    
+  
+- platform: mqtt
+  name: "Dryer Energy Yesterday"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Yesterday }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+
+- platform: mqtt
+  state_topic: "tele/dryer/STATE"
+  name: "Dryer Signal"
+  unit_of_measurement: "%"
+  value_template: "{{value_json['Wifi'].RSSI }}"
+  availability_topic: "tele/dryer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  
+- platform: mqtt
+  state_topic: "tele/dryer/SENSOR"
+  name: "Dryer Apparent Power"
+  unit_of_measurement: "W"
+  value_template: "{{value_json['ENERGY'].ApparentPower }}"
+  availability_topic: "tele/dryer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"  
 # Uk Transport
 
 
@@ -220,19 +320,31 @@
  
 - platform: template
   sensors:
+#    next_bus_route:
+#      friendly_name: "Next bus route"
+#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].route}}"
+#    next_bus_direction:
+#      friendly_name: "Next bus direction"
+#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].direction}}"
+#    next_bus_scheduled:
+#      friendly_name: "Next bus scheduled"
+#      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].scheduled}}"
+#    next_bus_estimated:
+#      friendly_name: "Next bus estimated"
+#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].estimated}}"
+
     next_bus_route:
       friendly_name: "Next bus route"
-      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].route}}"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].route}}"
     next_bus_direction:
       friendly_name: "Next bus direction"
-      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].direction}}"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].direction}}"
     next_bus_scheduled:
       friendly_name: "Next bus scheduled"
-      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].scheduled}}"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].scheduled}}"
     next_bus_estimated:
       friendly_name: "Next bus estimated"
-      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].estimated}}"
-
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].estimated}}"
 # Octopi Time in Hrs and minutes
 
 

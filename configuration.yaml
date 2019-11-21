@@ -20,13 +20,20 @@ homeassistant:
 # Enables the frontend
 frontend:
 
+ssdp:
+
+zeroconf:
+
+# Home assistant community store for custom plugins - token is from Github
+hacs:
+  token: f9344cea41b9954519eab339f992150431c7e9c2
+  
 # Enables configuration UI
 config:
 
-#Automatically update custom components if they support it
-custom_updater:
-  component_urls:
-    - https://raw.githubusercontent.com/keatontaylor/alexa_media_player/master/custom_components.json
+mobile_app:
+
+#
 
 http:
 #  api_password: !secret http_password
@@ -35,7 +42,12 @@ http:
   base_url: demig.duckdns.org:8123
 #  trusted_networks:
 
-mobile_app:
+
+
+weather:
+  platform: darksky
+  api_key: !secret darksky_api
+  mode: daily
 
 #Display ShireBrew in Hass - not working needs work
 camera:
@@ -117,13 +129,14 @@ octoprint:
 # zwave
 zwave:
   usb_path: /dev/zwave
+  
+breaking_changes:
 
-#panel_iframe: not workign needs work
-#  nodered:
-#   title: 'Node-Red'
-#   icon: 'mdi:shuffle-variant'
-#   url: 'https
-#   ://192.168.10.31:1880/'
+panel_iframe:
+  nodered:
+    title: 'Node-Red'
+    icon: 'mdi:shuffle-variant'
+    url: 'https://192.168.10.31:1880/'
    
 device_tracker:
 #  - platform: owntracks
@@ -156,6 +169,37 @@ mqtt:
 #  name: Office
 #  entity_id: switch.office_2
 
+# Kitchen Counter light Tasmota - Basic Sonoff
+switch washer:
+  platform: mqtt
+  name: "Washer"
+  state_topic: "stat/Washer/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/Washer/POWER"
+  availability_topic: "tele/Washer/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  unique_id: 6001945E0847
+  
+switch dryer:
+  platform: mqtt
+  name: "Dryer"
+  state_topic: "stat/dryer/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/dryer/POWER"
+  availability_topic: "tele/dryer/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  unique_id: CC50E3194074
+  
 light OfficeLight:
   platform: mqtt
   name: "Office"
@@ -186,13 +230,13 @@ light IainsLamp:
   retain: true
   
 # Kitchen Counter light Tasmota - Basic Sonoff
-light KitchenCounter:
+light Cooker:
   platform: mqtt
-  name: "KitchenCounter"
-  state_topic: "stat/KitchenCounter/RESULT"
+  name: "Cooker"
+  state_topic: "stat/Cooker/RESULT"
   value_template: "{{ value_json.POWER }}"
-  command_topic: "cmnd/KitchenCounter/POWER"
-  availability_topic: "tele/KitchenCounter/LWT"
+  command_topic: "cmnd/Cooker/POWER"
+  availability_topic: "tele/Cooker/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
@@ -200,22 +244,23 @@ light KitchenCounter:
   payload_not_available: "Offline"
   retain: true
   
-# Breakfast Bar light Tasmota - Basic Sonoff
+# Breakfast Bar light Tasmota - TH10 homeassistant discovery on so diffent topic structure
 light BreakfastBar:
   platform: mqtt
   name: "BreakfastBar"
-  state_topic: "stat/BreakfastBar/RESULT"
+  state_topic: "BreakfastBar/stat/RESULT"
   value_template: "{{ value_json.POWER }}"
-  command_topic: "cmnd/BreakfastBar/POWER"
-  availability_topic: "tele/BreakfastBar/LWT"
+  command_topic: "BreakfastBar/cmnd/POWER"
+  availability_topic: "BreakfastBar/tele/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
-# Sink light Tasmota - Basic Sonoff
+  unique_id: CC50E352EC0D
+
+  # Sink light Tasmota - Basic Sonoff
 light Sink:
   platform: mqtt
   name: "Sink"
@@ -260,14 +305,14 @@ light Loft:
   payload_not_available: "Offline"
   retain: true
  
- # Garage Strip light Tasmota - Basic Sonoff 
+ # Garage Strip light Tasmota - Sonof Dual R2
 light GarageStrip:
   platform: mqtt
-  name: "Garage"
-  state_topic: "stat/Garage/RESULT"
-  value_template: "{{ value_json.POWER }}"
-  command_topic: "cmnd/Garage/POWER"
-  availability_topic: "tele/Garage/LWT"
+  name: "GarageStrip"
+  state_topic: "Garage/stat/RESULT"
+  value_template: "{{ value_json.POWER1 }}"
+  command_topic: "Garage/cmnd/POWER1"
+  availability_topic: "Garage/tele/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
@@ -275,6 +320,21 @@ light GarageStrip:
   payload_not_available: "Offline"
   retain: true
 
+# Garage Flood light Tasmota - Sonof Dual R2
+light GarageFlood:
+  platform: mqtt
+  name: "GarageFlood"
+  state_topic: "Garage/stat/RESULT"
+  value_template: "{{ value_json.POWER2 }}"
+  command_topic: "Garage/cmnd/POWER2"
+  availability_topic: "Garage/tele/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  
  # Fish tank Tasmota - S26 192.168.10.209  
 switch FishTank:
   platform: mqtt

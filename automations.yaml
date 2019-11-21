@@ -62,7 +62,7 @@
       
 ### turn Hall light sonoff off when door has been shut for a total of 5 minutes
 - alias: 'Hall Light off'
-  hide_entity: True
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
@@ -102,8 +102,8 @@
 ### Garage Strip Light
 #
 # Garage Strip light on when garage internal door opens triggering zwave sensor
-- alias: 'Garage Strip Light on'
-  hide_entity: True
+- alias: 'Garage on'
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
@@ -111,10 +111,10 @@
       to: '22'
   action:
     - service: light.turn_on
-      entity_id: light.garage_strip
+      entity_id: group.garage
 # Garage strip light off when internal Garage door closes triggering zwave sensor   
-- alias: 'Garage Strip Light off'
-  hide_entity: True
+- alias: 'Garage Off'
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
@@ -122,39 +122,44 @@
       to: '23'
   action:
     - service: light.turn_off
-      entity_id: light.garage_strip
+      entity_id: group.garage
 #
 ### Kitchen undercupboard lights triggered by zwave pir sensor
 #
 - alias: 'Kitchen Light off'
-  hide_entity: True
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.kitchenpir_burglar
       from: '8'
       to: '0'
       for:
-        minutes: 5 
+        minutes: 3 
   action:
     - service: light.turn_off
       entity_id: group.kitchen
 # Kitchen under cupboard lights on if zwave PIR triggered after sunset or raining 
-- alias: 'Kitchen Light on'
-  hide_entity: True
+- alias: 'Kitchen Light on motion if PIR trigger 1 hr before sunset or raining, not active at night'
+  hide_entity: False
   trigger:
     - platform: state
       entity_id: sensor.kitchenpir_burglar
       from: '0'
       to: '8'
   condition:
-    condition: or
+    condition: and
     conditions:
-      - condition: sun
-        after: 'sunset'
-        after_offset: "-01:00:00"
-      - condition: state
-        entity_id: sensor.dark_sky_precip
-        state: 'rain'
+      - condition: time
+        after: '07:00:00'
+        before: '00:30:00'
+      - condition: or
+        conditions:
+          - condition: sun
+            after: 'sunset'
+            after_offset: "-01:00:00"
+          - condition: state
+            entity_id: sensor.dark_sky_precip
+            state: 'rain'
   action:
     - service: light.turn_on
       entity_id: group.kitchen
@@ -183,6 +188,17 @@
       from: 'AbbiWork'
       # Optional
       #to: 'Away'
+  condition:
+    - condition: time
+      after: '15:00:00'
+      before: '19:00:00'
+      weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+      
 #  action:
 #    - service: notify.ios_iosIH
 #      data:
@@ -200,7 +216,7 @@
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
-          - media_player.lounge
+          - media_player.downstairs
           - media_player.bedroom
         message: "Abbi has left work"
  #   - service: notify.ios_iosIH
@@ -220,7 +236,7 @@
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
-          - media_player.lounge
+          - media_player.downstairs
           - media_player.bedroom
         message: "Abbi will be home in five minutes put the kettle on!"
   
@@ -234,14 +250,14 @@
   hide_entity: false
   trigger:
     - platform: numeric_state
-      entity_id: sensor.Washer_Power
+      entity_id: sensor.washer_power
       above: 10
       for:
         seconds: 20
 # Make sure washer isn't already running and delaying between cycles - don't re-trigger and cause stopwatch reset
   condition:
     condition: template
-    value_template: "{{ states.sensor.Washer_State.state != 'Washing' }}"
+    value_template: "{{ states.sensor.washer_state.state != 'Washing' }}"
   action:
     service: mqtt.publish
     data:
@@ -252,7 +268,7 @@
   hide_entity: false
   trigger:
     - platform: numeric_state
-      entity_id: sensor.washer_Power
+      entity_id: sensor.washer_power
       below: 5
       for:
         minutes: 5
@@ -267,7 +283,7 @@
 - alias: 'Washer Finished'
   trigger:
     platform: state
-    entity_id: sensor.Washer_State
+    entity_id: sensor.washer_state
     from: 'Washing'
     to: 'Idle'
   condition:
@@ -312,10 +328,71 @@
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
-          - media_player.lounge
+          - media_player.downstairs
           - media_player.bedroom
         message: "Laundry in the washing machine is done."
    
+
+#
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#  Dryer Start/Finish
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+- alias: 'Dryer State - Start'
+  hide_entity: false
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.dryer_power
+      above: 100
+      for:
+        seconds: 60
+# Make sure dryer isn't already running and delaying between cycles - don't re-trigger and cause stopwatch reset
+  condition:
+    condition: template
+    value_template: "{{ states.sensor.dryer_state.state != 'Drying' }}"
+  action:
+    service: mqtt.publish
+    data:
+      topic: hass/state/dryer
+      payload: 'Drying'
+      retain: 'true'
+- alias: 'Dryer State - Idle'
+  hide_entity: false
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.dryer_power
+      below: 20
+      for:
+        minutes: 10
+  action:
+    service: mqtt.publish
+    data:
+      topic: hass/state/dryer
+      payload: 'Idle'
+      retain: 'true'
+
+- alias: 'Dryer Finished'
+  trigger:
+    platform: state
+    entity_id: sensor.dryer_state
+    from: 'Drying'
+    to: 'Idle'
+  condition:
+    condition: time
+    after: '09:00:00'
+    before: '23:00:00'
+  
+  action:
+    - service: notify.alexa_media
+      data:
+        data:
+          type: announce
+        target:
+          - media_player.office
+          - media_player.kitchen
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        message: "Tumble dryer has stopped, please check if it has finished or needs emptying"
 
 ## Shire 3D print finished
 #
@@ -353,7 +430,7 @@
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
-          - media_player.lounge
+          - media_player.downstairs
           - media_player.bedroom
         message: "3D printer is finished."
   
