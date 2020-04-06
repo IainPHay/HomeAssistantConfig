@@ -7,64 +7,67 @@ homeassistant:
   time_zone: Europe/London
   customize: !include customize.yaml
   auth_providers:
+    - type: homeassistant
     - type: trusted_networks
       trusted_networks:
         - 127.0.0.1
         - 192.168.10.0/24
     - type: legacy_api_password
       api_password: !secret http_password
-
-# Show links to resources in log and frontend
-# introduction:
-
+#
 # Enables the frontend
+#
 frontend:
+#
+#
+cloud:
 
 ssdp:
 
+
 zeroconf:
 
-# Home assistant community store for custom plugins - token is from Github
-hacs:
-  token: f9344cea41b9954519eab339f992150431c7e9c2
+#Home assistant community store for custom plugins - token is from Github
+#hacs:
+#  token: fa433d53fe9f693a257e9aa46327c5f085bab9233
   
 # Enables configuration UI
 config:
 
 mobile_app:
 
-#
+person: 
 
 http:
 #  api_password: !secret http_password
   ssl_certificate: /home/homeassistant/dehydrated/certs/demig.duckdns.org/fullchain.pem
   ssl_key: /home/homeassistant/dehydrated/certs/demig.duckdns.org/privkey.pem
   base_url: demig.duckdns.org:8123
-#  trusted_networks:
-
-
 
 weather:
   platform: darksky
   api_key: !secret darksky_api
-  mode: daily
+  mode: hourly
+
 
 #Display ShireBrew in Hass - not working needs work
-camera:
-  platform: generic
-  still_image_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEdfhSUFm2MKj1cDbX6HKDHEKzbSpBbaeYP_4rb83_bMIjJOj3d4WRUV6bBgfbBJ093iUg1q5mhxV/pubchart?oid=1890832659&format=image
-  name: "ShireBrew"  
+#camera:
+#  platform: generic
+#  still_image_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEdfhSUFm2MKj1cDbX6HKDHEKzbSpBbaeYP_4rb83_bMIjJOj3d4WRUV6bBgfbBJ093iUg1q5mhxV/pubchart?oid=1890832659&format=image
+#  name: "ShireBrew"  
 
 
-# Alexa integration for announcements etc
-alexa_media:
-  accounts:
-    - email: iain@demig.co.uk
-      password: Jupiter562589
-      url: amazon.co.uk
+ #Alexa integration for announcements etc superceded by integrations
+#alexa_media:
+#  accounts:
+#    - email: iain@demig.co.uk
+#      password: Amherst562589
+#      url: amazon.co.uk
 
 # Displays network speed test      
 speedtestdotnet:
+
+ios:
 
 # Checks for available updates
 updater:
@@ -75,6 +78,9 @@ discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 #conversation:
+
+#pi-hole:
+#  host: 192.168.10.71
 
 notify:
   platform: alexa_media
@@ -87,8 +93,6 @@ notify:
  #     - service: ios_abbiios
 
 
-#logentries:
-#  token: b9aeee09-97c7-4787-90b3-9c83138e240a
 
 # Enables support for tracking state changes over time
 history:
@@ -105,16 +109,66 @@ map:
 
 # Track the sun
 sun:
-   
-ios:
 
-#emulated_hue:
-#  host_ip: 192.168.1.31
-#  expose_by_default: false
-  
+cover:
+  platform: mqtt
+  name: "Garage Door"
+  command_topic: "cmnd/RFBridge/Backlog"
+  payload_open:  "RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; RfRaw 0"
+  payload_close: "RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; Rfraw 0"
+  payload_stop: "RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; rfraw 0"
+
+
+emulated_hue:
+  host_ip: 192.168.10.31
+  listen_port: 8300
+  expose_by_default: false
+  exposed_domains:
+    - light
+    - cover
+  entities:
+    cover.garage_door:
+      name: "Garage Door"
+      hidden: false
+    light.alexa_virtual:
+      name: "Alexa Virtual"
+      hidden: false
+    light.OfficeLight:
+      hidden: true
+    light.IainLamp:
+      hidden: true
+    light.AbbiLamp:
+      hidden: true
+    light.UtilityFront:
+      hidden: true
+    light.UtilityBack:
+      hidden: true
+    light.Alcove:
+      hidden: true
+    light.UtilityCounter:
+      hidden: true
+    light.KitchenMain:
+      hidden: true
+    light.Cooker:
+      hidden: true
+    light.CookerLight:
+      hidden: true
+    light.Loft:
+      hidden: true
+    light.Hall:
+      hidden: true
+    light.GarageStrip:
+      hidden: true
+    light.Breakfast:
+      hidden: true
+    light.Sink:
+      hidden: true
+    light.GarageFlood:
+      hidden: true
+      
 octoprint:
-  host: 192.168.10.10
-  api_key: 321E4FCFC6CD4EE1901F3539773B4B7F
+  host: 192.168.10.99
+  api_key: 5BE7FCEEFC164ED0B45F70BC688C5895
   name: Shire3D
   bed: true
   number_of_tools: 1
@@ -130,20 +184,29 @@ octoprint:
 zwave:
   usb_path: /dev/zwave
   
-breaking_changes:
+#hpprinter:
+#  devices:
+#    - host: 192.168.10.81
+#      name: ShireInkJet
+  
+#breaking_changes:
 
+#
+# Noode red broken due to ssl certification - setup on hassio
+#
 panel_iframe:
   nodered:
     title: 'Node-Red'
     icon: 'mdi:shuffle-variant'
-    url: 'https://192.168.10.31:1880/'
+    url: 'http://192.168.10.31:1880/'
    
 device_tracker:
 #  - platform: owntracks
 #    max_gps_accuracy: 200
 #    mqtt_topic: "owntracks/#"
-
-# Local mqtt - Mosquitto on HomeAssistant pi
+#
+# Local mqtt broker - Mosquitto on HomeAssistant pi
+#
 mqtt:
   broker: 192.168.10.31
   port: 1883
@@ -159,17 +222,11 @@ mqtt:
     payload: "Offline"
     qos: 1
     retain: true
-
-### House Lights
 #
-#Office light Tasmota - Basic Sonoff
-#light:
-
-#  platform: switch
-#  name: Office
-#  entity_id: switch.office_2
-
-# Kitchen Counter light Tasmota - Basic Sonoff
+# MQTT Switches
+#
+# Washing machine Tasmota POW R2 192.168.10.222
+#
 switch washer:
   platform: mqtt
   name: "Washer"
@@ -184,7 +241,9 @@ switch washer:
   payload_not_available: "Offline"
   retain: true
   unique_id: 6001945E0847
-  
+#
+# Not in use new tasmota unit required
+#
 switch dryer:
   platform: mqtt
   name: "Dryer"
@@ -198,8 +257,107 @@ switch dryer:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  unique_id: CC50E3194074
-  
+#
+# Kitchen Extraction - TH10 192.168.10.206
+#
+switch Extraction:
+  platform: mqtt
+  name: "Extraction"
+  state_topic: "stat/Extraction/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/Extraction/POWER"
+  availability_topic: "tele/Extraction/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+
+# Garage door vis sonoff rf bridge 192.168.10.222
+# cmnd/RFBridge/Backlog RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; RfRaw 0
+switch GarageDoor:
+  platform: mqtt
+  name: "GarageDoor"
+  state_topic: "stat/RFBridge/RESULT"
+  #value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/RFBridge/Backlog"
+  #availability_topic: "tele/Extraction/LWT"
+  qos: 1
+  payload_on: "RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; RfRaw 0"
+  payload_off: "RfRaw AAB021030804060A3C6D9C2819081818190819081818181909081818181818190908181855; RfRaw 0"
+  availability_topic: "tele/RFBridge/tele/LWT"
+  payload_available: Online
+  payload_not_available: Offline
+  #payload_available: "Online"
+  #payload_not_available: "Offline"
+  #retain: true
+#
+# Christmas only active in December - set automation to display sensors then
+#
+# Christmas Tree Lights Tasmota - S26 192.168.10.203  
+#
+switch ChristmasTree:
+  platform: mqtt
+  name: "ChristmasTree"
+  state_topic: "stat/XmasTree/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/XmasTree/POWER"
+  availability_topic: "tele/XmasTree/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Christmas Candles 
+#
+switch ChristmasCandles:
+  platform: mqtt
+  name: "ChristmasCandles"
+  state_topic: "stat/ChristmasCandles/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/ChristmasCandles/POWER"
+  availability_topic: "tele/ChristmasCandles/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Outside Lights Tasmota - S26 192.168.10.209  
+#
+switch ChristmasHouse:
+  platform: mqtt
+  name: "ChristmasHouse"
+  state_topic: "stat/ChristmasHouse/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/ChristmasHouse/POWER"
+  availability_topic: "tele/ChristmasHouse/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Lights
+#
+# alexa_virtual Fake light for emulated hue to enable Alex speak options
+#
+light:
+  - platform: template
+    lights:
+      alexa_virtual:
+        friendly_name: "Alexa Dummy Light"
+        turn_on:
+        turn_off:
+        set_level:
+#        
+# Tasmota TH10 IP 192.168.10.
+#
 light OfficeLight:
   platform: mqtt
   name: "Office"
@@ -213,8 +371,9 @@ light OfficeLight:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-
-# Iain's Bedside light Tasmota - TH10 plus humidity and temperature
+#
+# Iain's Bedside light Tasmota - TH10 plus humidity and temperature 192.168.10.200
+#
 light IainsLamp:
   platform: mqtt
   name: "IainLamp"
@@ -228,39 +387,134 @@ light IainsLamp:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
-# Kitchen Counter light Tasmota - Basic Sonoff
+#
+# Abbi's Bedside light Tasmota - TH10 192.168.10.2
+#
+light AbbiLamp:
+  platform: mqtt
+  name: "AbbiLamp"
+  state_topic: "stat/AbbiLamp/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/AbbiLamp/POWER"
+  availability_topic: "tele/AbbiLamp/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Utility room lights, front and back on Minitiger 2G no neutral 192.168.10.239 
+#
+light UtilityFront:
+  platform: mqtt
+  name: "UtilityFront"
+  state_topic: "stat/utility/RESULT"
+  value_template: "{{ value_json.POWER1 }}"
+  command_topic: "cmnd/utility/POWER1"
+  availability_topic: "tele/utility/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+light UtilityBack:
+  platform: mqtt
+  name: "UtilityBack"
+  state_topic: "stat/utility/RESULT"
+  value_template: "{{ value_json.POWER2 }}"
+  command_topic: "cmnd/utility/POWER2"
+  availability_topic: "tele/utility/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Utility Counter Tasmota TH10 192.168.10.
+#
+light UtilityCounter:
+  platform: mqtt
+  name: "UtilityCounter"
+  state_topic: "UtilityCounter/stat/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "UtilityCounter/cmnd/POWER"
+  availability_topic: "UtilityCounter/tele/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+#
+# Kitchen Main  Tasmota 192.168.10.208 
+#
+light KitchenMain:
+  platform: mqtt
+  name: "KitchenMain"
+  state_topic: "stat/KitchenMain/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/KitchenMain/POWER"
+  availability_topic: "tele/KitchenMain/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true    
+#  
+# Kitchen Counter light Tasmota - Minitiger Single 192.168.10.214
+#
 light Cooker:
   platform: mqtt
-  name: "Cooker"
-  state_topic: "stat/Cooker/RESULT"
+  name: "Counter"
+  state_topic: "stat/Counter/RESULT"
   value_template: "{{ value_json.POWER }}"
-  command_topic: "cmnd/Cooker/POWER"
-  availability_topic: "tele/Cooker/LWT"
+  command_topic: "cmnd/Counter/POWER"
+  availability_topic: "tele/Counter/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
-# Breakfast Bar light Tasmota - TH10 homeassistant discovery on so diffent topic structure
-light BreakfastBar:
+#
+# Kitchen Cooker light light Tasmota basic 192.168.10.235
+#
+light CookerLight:
   platform: mqtt
-  name: "BreakfastBar"
-  state_topic: "BreakfastBar/stat/RESULT"
+  name: "CookerLight"
+  state_topic: "stat/CookerLight/RESULT"
   value_template: "{{ value_json.POWER }}"
-  command_topic: "BreakfastBar/cmnd/POWER"
-  availability_topic: "BreakfastBar/tele/LWT"
+  command_topic: "cmnd/CookerLight/POWER"
+  availability_topic: "tele/CookerLight/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  unique_id: CC50E352EC0D
-
-  # Sink light Tasmota - Basic Sonoff
+#  
+# Breakfastbar light Tasmota - Minitiger 1G 192.168.10.213
+#
+light Breakfast:
+  platform: mqtt
+  name: "Breakfast"
+  state_topic: "stat/BreakfastBar/RESULT"
+  value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/BreakfastBar/POWER"
+  availability_topic: "tele/BreakfastBar/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+# 
+# Sink light Tasmota - Basic Sonoff
+#
 light Sink:
   platform: mqtt
   name: "Sink"
@@ -274,8 +528,9 @@ light Sink:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
-# Hall light Tasmota - Basic Sonoff 
+#
+# Hall light Tasmota - TH10
+#
 light Hall:
   platform: mqtt
   name: "Hall"
@@ -289,8 +544,9 @@ light Hall:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
- 
+#
 # Loft light Tasmota - Basic Sonoff 
+#
 light Loft:
   platform: mqtt
   name: "Loft"
@@ -304,8 +560,9 @@ light Loft:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
- 
- # Garage Strip light Tasmota - Sonof Dual R2
+# 
+# Garage lights Tasmota - Sonof Dual R2
+#
 light GarageStrip:
   platform: mqtt
   name: "GarageStrip"
@@ -319,8 +576,6 @@ light GarageStrip:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-
-# Garage Flood light Tasmota - Sonof Dual R2
 light GarageFlood:
   platform: mqtt
   name: "GarageFlood"
@@ -334,42 +589,54 @@ light GarageFlood:
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
-  
- # Fish tank Tasmota - S26 192.168.10.209  
-switch FishTank:
+#
+# Alcove  Tasmota 192.168.10.238
+#
+light Alcove:
   platform: mqtt
-  name: "FishTank"
-  state_topic: "stat/FishTank/RESULT"
+  name: "Alcove"
+  state_topic: "stat/Alcove/RESULT"
   value_template: "{{ value_json.POWER }}"
-  command_topic: "cmnd/FishTank/POWER"
-  availability_topic: "tele/FishTank/LWT"
+  command_topic: "cmnd/Alcove/POWER"
+  availability_topic: "tele/Alcove/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
-  retain: true
-
-
+  retain: true    
+#
+# Hive Heating
+#
 hive:
   username: !secret hive_user
   password: !secret hive_password
-   
+#
+# Car details
+#   
 bmw_connected_drive:
-  mycar:
+  420d:
     username: !secret bmw_user
     password: !secret bmw_password
     region: "rest_of_world"
 #
-### Plant component to amalgamate miflora readings
+# Plant component to amalgamate miflora readings
 #
 plant:
-  KaffirLime:
+  Lime:
     sensors:
       moisture: sensor.lime_moisture
       temperature: sensor.lime_temperature
       conductivity: sensor.lime_conductivity
       brightness: sensor.lime_light_intensity
+    min_moisture: 35
+    min_conductivity: 800
+  Orchid:
+    sensors:
+      moisture: sensor.orchid_moisture
+      temperature: sensor.orchid_temperature
+      conductivity: sensor.orchid_conductivity
+      brightness: sensor.orchid_light_intensity
     min_moisture: 35
     min_conductivity: 800
 
@@ -387,14 +654,25 @@ plant:
 #      HDMI5: "FireTV"
 
 #Text to speech
-tts:
-  - platform: google_translate
-    service_name: google_say
+#tts:
+#  - platform: google_translate
+#    service_name: google_say
   
-  
+
+
+#binary_sensor:
+#  - platform: mqtt
+#    state_topic: "tele/RFBridge/RESULT"
+#    name: "GarageDoor"
+#    value_template: "{{value_json.RfReceived.Data}}"
+#    payload_on: 'B221A7'
+#    payload_off: 'B221AE'
+#    device_class: garage_door
+#    qos: 1
 
 group: !include groups.yaml
 sensor: !include sensors.yaml
 zone: !include zones.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
+binary_sensor: !include binary_sensors.yaml

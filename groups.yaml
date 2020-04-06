@@ -1,24 +1,15 @@
-#pihole:
-#  name: Pi Hole Status
-#  entities:
-#    - sensor.pihole_status
-#    - script.enable_pihole
-#    - input_select.pihole_time
-#    - sensor.pihole_ads_blocked_today
-#    - sensor.pihole_ads_percentage_blocked_today
-#    - sensor.pihole_dns_queries_cached
-#    - sensor.pihole_dns_queries_forwarded
-#    - sensor.pihole_dns_queries_today
-#    - sensor.pihole_dns_unique_clients
-#    - sensor.pihole_dns_unique_domains
-#    - sensor.pihole_domains_blocked
-#Kitchen
+#
+# Kitchen
+#
   Kitchen:
-    - light.kitchencounter
     - light.sink
-    - light.breakfastbar
-    - light.cooker
+    - light.Breakfast
+    - light.counter
+    - light.KitchenMain
+    - light.cookerlight
+#
 # Washer
+#
   Washing Machine:
     - sensor.Washer_State
     - sensor.washer_amps
@@ -30,8 +21,9 @@
     - sensor.washer_signal
     - sensor.washer_apparentpower
     - switch.washer
-
+#
 # Dryer
+#
   Dryer:
     - sensor.dryer_State
     - sensor.dryer_amps
@@ -43,12 +35,22 @@
     - sensor.dryer_signal
     - sensor.dryer_apparentpower
     - switch.dryer
+#
 #Garage
+#
   Garage:
     - light.garagestrip
     - light.garageflood
-    
+#   
+#Utility Room
+#
+  Utility:
+    - light.UtilityFront
+    - light.UtilityBack
+    - light.utilitycounter 
+#
 #Bathroom
+#
   Bathroom:
     - light.bathroom_1_2
     - light.bathroom_2_2
@@ -56,8 +58,9 @@
     - light.bathroom_4_2
     - light.bathroom_5_2
     - light.bathroom_6_2
-    
+#    
 # Internet
+#
   BTInternet:
     - sensor.bt_home_hub_6_0a_bytes_received
     - sensor.bt_home_hub_6_0a_bytes_sent
@@ -66,11 +69,7 @@
     - sensor.bt_home_hub_6_0a_packets_received
     - sensor.bt_home_hub_6_0a_packets_sent
     - sensor.bt_home_hub_6_0a_packets_sec_received
-    - sensor.bt_home_hub_6_0a_packets_sec_sent
-    
-# pi-hole
- # Pi-Hole:
- #   - sensor.Pi-Hole.Ads.Blocked.Today
+    - sensor.bt_home_hub_6_0a_packets_sec_sent  
 #
 #BMW
 #
@@ -86,9 +85,8 @@
     - sensor.420d_remaining_fuel
     - sensor.420d_remaining_range_fuel
     - sensor.420d_remaining_range_total
-    
-    
-#Next Bus
+#    
+# Next Bus
 #
   BUS:
     - sensor.next_bus_direction
@@ -96,4 +94,25 @@
     - sensor.next_bus_scheduled
     - sensor.next_bus_estimated
     - sensor.next_bus_route
-    
+#    
+# Speedtest
+#
+  Speedtest:
+    - sensor.speedtest_download
+    - sensor.speedtest_ping
+    - sensor.speedtest_upload
+ #   
+#pihole:
+#  name: Pi Hole Status
+#  entities:
+#    - sensor.pihole_status
+#    - script.enable_pihole
+#    - input_select.pihole_time
+#    - sensor.pihole_ads_blocked_today
+#    - sensor.pihole_ads_percentage_blocked_today
+#    - sensor.pihole_dns_queries_cached
+#    - sensor.pihole_dns_queries_forwarded
+#    - sensor.pihole_dns_queries_today
+#    - sensor.pihole_dns_unique_clients
+#    - sensor.pihole_dns_unique_domains
+#    - sensor.pihole_domains_blocked

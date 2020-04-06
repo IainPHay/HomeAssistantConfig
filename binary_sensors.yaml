@@ -1,0 +1,30 @@
+#
+# Garage Door SENSOR
+#
+- platform: mqtt
+  name: "Garage Door"
+  state_topic: "tele/RFBridge/RESULT"
+  value_template: >-
+    {% if value_json.RfReceived.Data == 'B221AE' %}
+      {{'ON'}}
+    {% elif value_json.RfReceived.Data == 'B221A7' %}
+      {{'OFF'}}
+    {% else %}
+      {{states('binary_sensor.garage_door') | upper}}
+    {% endif %}
+  device_class: garage_door
+#
+# Bathroom Door SENSOR
+#
+- platform: mqtt
+  name: "Bathroom Door"
+  state_topic: "tele/RFBridge/RESULT"
+  value_template: >-
+    {% if value_json.RfReceived.Data == 'CFC26E' %}
+      {{'ON'}}
+    {% elif value_json.RfReceived.Data == 'CFC267' %}
+      {{'OFF'}}
+    {% else %}
+      {{states('binary_sensor.bathroom_door') | upper}}
+    {% endif %}
+  device_class: door

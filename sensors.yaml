@@ -1,24 +1,65 @@
-### sensors.yaml
-
-# Pi-Hole component
-- platform: pi_hole
-  host: 192.168.10.71
-  monitored_conditions:
-      - ads_blocked_today
-      - ads_percentage_today
-      - dns_queries_today
-      - domains_being_blocked
-      - queries_cached
-      - queries_forwarded
-      - unique_clients
-      - unique_domains
-
+#
 # Raspberry Pi Power monitor
-- platform: rpi_power
-  text_state: true      
+#
+#- platform: rpi_power
+#  text_state: true      
+#
+# DarkSky weather
+#
+#
+# Last Alexa used
+#
+#
+# Brewdog
+#
+#
 
-# DarkSky hyper local weather
+#
+# Hall Barometric Pressure
+#
 
+- platform: mqtt
+  state_topic: "tele/HallSensor/SENSOR"
+  name: "Pressure"
+  unit_of_measurement: "hPa"
+  value_template: "{{value_json['BMP180'].Pressure }}"
+  availability_topic: "tele/HallSensor/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Hall Temperature
+#
+
+
+- platform: mqtt
+  state_topic: "tele/HallSensor/SENSOR"
+  name: "HallTemp"
+  unit_of_measurement: "°C"
+  value_template: "{{value_json['BMP180'].Temperature }}"
+  availability_topic: "tele/HallSensor/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+
+  
+- platform: brewdog
+  
+- platform: template
+  sensors:
+      last_alexa:
+        entity_id:
+          - media_player.downstairs
+          - media_player.iain_s_3rd_echo_dot # Barney
+          - media_player.barney # bathroom
+          - media_player.bedroom
+          - media_player.iain_s_2nd_echo_dot # garage
+          - media_player.garage # Utility
+          - media_player.kitchen
+          - media_player.office_2
+        value_template: >
+          {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
 - platform: darksky
   api_key: !secret darksky_api
   monitored_conditions:
@@ -30,21 +71,9 @@
     - temperature
     - daily_summary
     - temperature_max
-      
-#~- platform: speedtest
-#~  server_id: 10602
-#  minute: 00
-#  hour:
-#    - 0
-#    - 6
-#    - 12
-#    - 18
-#  monitored_conditions:
-  #  - ping
-#    - download
-#    - upload
-
+#     
 # Monitor plant Kaffir Lime
+#
 - platform: miflora
   mac: C4:7C:8D:65:5F:47
   name: Lime
@@ -54,20 +83,482 @@
     - moisture
     - light
     - conductivity
-
-# Monitor downstairs plant
+#
+# Monitor orchid plant
+#
 - platform: miflora
   mac: C4:7C:8D:65:55:8D
-  name: DownstairPlant
+  name: Orchid
   median: 3
   monitored_conditions:
     - temperature
     - moisture
     - light
     - conductivity
-
-
-
+#
+# Bedroom tasmota 192.168.10.200 temperature
+#
+- platform: mqtt
+  name: "Bedroom Temp"
+  state_topic: "tele/IainLamp/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "tele/IainLamp/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#    
+# Bedroom tasmota 192.168.10.200 humidity
+#
+- platform: mqtt
+  name: "Bedroom Humidity"
+  state_topic: "tele/IainLamp/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "tele/IainLamp/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#    
+# Bedroom tasmota 192.168.10.200 dewpoint
+#
+- platform: mqtt
+  name: "Bedroom Dewpoint"
+  state_topic: "tele/IainLamp/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].DewPoint }}"
+  availability_topic: "tele/IainLamp/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Kitchen Main tasmota 192.168.10.208 temperature
+#
+- platform: mqtt
+  name: "Kitchen Main Temp"
+  state_topic: "tele/KitchenMain/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "tele/KitchenMain/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+ #
+ # Kitchen Dewpoint
+ #
+- platform: mqtt
+  name: "Kitchen Dewpoint"
+  state_topic: "tele/KitchenMain/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].DewPoint }}"
+  availability_topic: "tele/KitchenMain/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#   
+# Kitchen Main tasmota 192.168.10.208 humidity
+#
+- platform: mqtt
+  name: "Kitchen Humidity"
+  state_topic: "tele/KitchenMain/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "tele/KitchenMain/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Kitchen Extractor Hood Tasmota temperature
+#
+- platform: mqtt
+  name: "Cooker Hood Temp"
+  state_topic: "tele/Extraction/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "tele/Extraction/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Kitchen Extractor Hood Tasmota Dewpoint
+- platform: mqtt
+  name: "Cooker Hood Dewpoint"
+  state_topic: "tele/Extraction/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].DewPoint }}"
+  availability_topic: "tele/Extraction/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#    
+# Kitchen Extractor Hood Tasmota Humidity
+#
+- platform: mqtt
+  name: "Cooker Hood Humidity"
+  state_topic: "tele/Extraction/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "tele/Extraction/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Utility Tasmota temperature
+#
+- platform: mqtt
+  name: "Utility Temp"
+  state_topic: "UtilityCounter/tele/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "UtilityCounter/tele/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Utility Tasmota dewpoint
+#
+- platform: mqtt
+  name: "Utility Dewpoint"
+  state_topic: "UtilityCounter/tele/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].DewPoint }}"
+  availability_topic: "UtilityCounter/tele/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#    
+# Utility tasmota 192.168.10.229 humidity
+#
+- platform: mqtt
+  name: "Utility Humidity"
+  state_topic: "UtilityCounter/tele/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "UtilityCounter/tele/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Lounge ("Christmas") tasmota temperature
+# 
+- platform: mqtt
+  name: "Downstairs Temp"
+  state_topic: "tele/Christmas/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].Temperature }}"
+  availability_topic: "tele/Christmas/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Lounge ("Christmas") tasmota dewpoint
+# 
+- platform: mqtt
+  name: "Downstairs Dewpoint"
+  state_topic: "tele/Christmas/SENSOR"
+  unit_of_measurement: '°C'
+  value_template: "{{ value_json['SI7021'].DewPoint }}"
+  availability_topic: "tele/Christmas/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#    
+# Christmas tasmota humidity
+#
+- platform: mqtt
+  name: "Downstairs Humidity"
+  state_topic: "tele/Christmas/SENSOR"
+  unit_of_measurement: '%'
+  value_template: "{{ value_json['SI7021'].Humidity }}"
+  availability_topic: "tele/Christmas/LWT"
+  payload_available: "Online"
+  payload_not_available: "offline"
+#
+# Washer state for automation 
+#
+- platform: mqtt
+  name: "Washer State"
+  state_topic: "hass/state/washer"
+  icon: mdi:washing-machine
+#
+# Washer power Tasmota 192.168.10.220
+#
+- platform: mqtt
+  name: "Washer Power"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Power }}"
+  qos: 2
+  unit_of_measurement : "W"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer Voltage Tasmota 192.168.10.220
+#
+- platform: mqtt
+  name: "Washer Voltage"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Voltage }}"
+  qos: 2
+  unit_of_measurement : "V"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer Amps Tasmota 192.168.10.220
+# 
+- platform: mqtt
+  name: "Washer Amps"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Current }}"
+  qos: 2
+  unit_of_measurement : "A"
+  icon: mdi:flash-circle
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer energy today Tasmota 192.168.10.220
+#   
+- platform: mqtt
+  name: "Washer Energy Today"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Today }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer energy yesterday Tasmota 192.168.10.220
+#      
+- platform: mqtt
+  name: "Washer Energy Yesterday"
+  state_topic: "tele/Washer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Yesterday }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/Washer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer WiFi Signal Tasmota 192.168.10.220
+#
+- platform: mqtt
+  state_topic: "tele/Washer/STATE"
+  name: "Washer Signal"
+  unit_of_measurement: "%"
+  value_template: "{{value_json['Wifi'].RSSI }}"
+  availability_topic: "tele/Washer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Washer Apparent power Tasmota 192.168.10.220
+#  
+- platform: mqtt
+  state_topic: "tele/Washer/SENSOR"
+  name: "Washer Apparent Power"
+  unit_of_measurement: "W"
+  value_template: "{{value_json['ENERGY'].ApparentPower }}"
+  availability_topic: "tele/Washer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"  
+# 
+# Tumble dryer power
+#
+- platform: mqtt
+  name: "Dryer State"
+  state_topic: "hass/state/dryer"
+  icon: mdi:washing-machine
+#
+# Dryer power Tasmota 
+#
+- platform: mqtt
+  name: "Dryer Power"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Power }}"
+  qos: 2
+  unit_of_measurement : "W"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer Voltage Tasmota 
+#
+- platform: mqtt
+  name: "Dryer Voltage"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Voltage }}"
+  qos: 2
+  unit_of_measurement : "V"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer Amps Tasmota 
+#
+- platform: mqtt
+  name: "Dryer Amps"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Current }}"
+  qos: 2
+  unit_of_measurement : "A"
+  icon: mdi:flash-circle
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer energy today Tasmota 
+#    
+- platform: mqtt
+  name: "Dryer Energy Today"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Today }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer energy yesterday Tasmota 
+#    
+- platform: mqtt
+  name: "Dryer Energy Yesterday"
+  state_topic: "tele/dryer/SENSOR"
+  value_template: "{{value_json['ENERGY'].Yesterday }}"
+  qos: 2
+  unit_of_measurement : "kWh"
+  availability_topic: "tele/dryer/LWT"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer state for automation 
+#
+- platform: mqtt
+  state_topic: "tele/dryer/STATE"
+  name: "Dryer Signal"
+  unit_of_measurement: "%"
+  value_template: "{{value_json['Wifi'].RSSI }}"
+  availability_topic: "tele/dryer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"
+#
+# Dryer apparent power Tasmota 
+# 
+- platform: mqtt
+  state_topic: "tele/dryer/SENSOR"
+  name: "Dryer Apparent Power"
+  unit_of_measurement: "W"
+  value_template: "{{value_json['ENERGY'].ApparentPower }}"
+  availability_topic: "tele/dryer/LWT"
+  qos: 1
+  payload_available: "Online"
+  payload_not_available: "Offline"  
+#
+# Uk Transport - bus times from home bus stop to Newcastle
+#
+- platform: uk_transport
+  app_id: 88ca6b74
+  app_key: 258682558913e07176b986d2288fcf60
+  queries:
+    - mode: bus
+      origin: 3100Z199842
+      destination: Newcastle
+- platform: template
+  sensors:
+    next_bus_route:
+      friendly_name: "Next bus route"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].route}}"
+    next_bus_direction:
+      friendly_name: "Next bus direction"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].direction}}"
+    next_bus_scheduled:
+      friendly_name: "Next bus scheduled"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].scheduled}}"
+    next_bus_estimated:
+      friendly_name: "Next bus estimated"
+      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].estimated}}"
+#
+# Shire 3D convert seconds left to hours
+#
+    3dprinthoursleft:
+      friendly_name: "Hrs left"
+      unit_of_measurement: 'hours'
+      value_template: "{{ (states('sensor.shire3d_time_remaining')|float/3600) | round(1) }}"
+#
+# BMW connected convert range to miles
+#   
+    milesleft:
+      friendly_name: "Range"
+      unit_of_measurement: 'miles'
+      value_template: "{{ (states('sensor.420d_remaining_range_total')|float/1.609) | round(0) }}"
+#
+# BMW connected convert total distance traveled to miles
+#         
+    mileage:
+      friendly_name: "Mileage"
+      unit_of_measurement: 'miles'
+      value_template: "{{ (states('sensor.420d_mileage')|float/1.609) | round(0) }}"
+#
+# BMW connected display miles until Oil change
+#          
+    bmwoillife:
+      friendly_name: "Oil Life"
+      unit_of_measurement: 'miles'
+      value_template: "{{(state_attr('binary_sensor.420d_condition_based_services', 'oil distance').replace('km','')|float/1.609)|round }}"
+#
+# BMW connected display miles until service
+#     
+    carhealthcheck:
+      friendly_name: "Distance to health check"
+      unit_of_measurement: 'miles'
+      value_template: "{{(state_attr('binary_sensor.420d_condition_based_services', 'vehicle check distance').replace('km','')|float /1.609) |round}}"  
+#
+# BT Hub convert to kb from bytes received
+#         
+    bthubkbrcvd:
+      friendly_name: "BT kB rcvd"
+      unit_of_measurement: 'kB'
+      value_template: "{{ (states('sensor.bt_home_hub_6_0a_bytes_received')|float/1024) | round(0) }}"
+#
+# BT Hub convert to kb from bytes sent
+# 
+    bthubkbsent:
+      friendly_name: "BT kB sent"
+      unit_of_measurement: 'kB'
+      value_template: "{{ (states('sensor.bt_home_hub_6_0a_bytes_sent')|float/1024) | round(0) }}"
+#
+# Extract temperature from hive lounge sensor
+#     
+    loungetemp:
+      friendly_name: "Lounge TRV Temperature"
+      unit_of_measurement: 'degrees'
+      value_template: "{{(state_attr('climate.lounge', 'current_temperature'))}}"  
+#
+# Extract temperature from hive lounge sensor
+#     
+    bedroomtemp:
+      friendly_name: "Bedroom TRV Temperature"
+      unit_of_measurement: 'degrees'
+      value_template: "{{(state_attr('climate.bedroom_2', 'current_temperature'))}}"
+#
+# Extract temperature from hive lounge sensor
+#     
+    officetemp:
+      friendly_name: "Office TRV Temperature"
+      unit_of_measurement: 'degrees'
+      value_template: "{{(state_attr('climate.office', 'current_temperature'))}}"
+#
+# Extract temperature from Barney lounge sensor
+#     
+    barneytemp:
+      friendly_name: "Barney TRV Temperature"
+      unit_of_measurement: 'degrees'
+      value_template: "{{(state_attr('climate.barney_radiator', 'current_temperature'))}}"
+#
+# Waze Abbi time to work
+#       
+- platform: waze_travel_time
+  origin: 55.153073, -1.692775
+  destination: 55.079867, -1.590591
+  region: 'EU'
+  name: "Abbi to work"
+#  
+# Old code may not be needed
+#
 # Google geocode
 #
 #- platform: google_geocode
@@ -93,264 +584,7 @@
 #  api_key: !secret google_geocode_api
     
 # Certificate Expiry:
- # - sensor CertExp:
- #   platform: cert_expiry
- #   host: demig.duckdns.org
+# - sensor CertExp:
+#   platform: cert_expiry
+#   host: demig.duckdns.org
 
-# Bedroom tasmota temperature
-#  - sensor:
-- platform: mqtt
-  name: "Bedroom Temp"
-  state_topic: "tele/IainLamp/SENSOR"
-  unit_of_measurement: '°C'
-  value_template: "{{ value_json['SI7021'].Temperature }}"
-  availability_topic: "tele/IainLamp/LWT"
-  payload_available: "Online"
-  payload_not_available: "offline"
-    
-# Bedroom tasmota humidity
-#  - sensor:
-- platform: mqtt
-  name: "Bedroom Humidity"
-  state_topic: "tele/IainLamp/SENSOR"
-  unit_of_measurement: '%'
-  value_template: "{{ value_json['SI7021'].Humidity }}"
-  availability_topic: "tele/IainLamp/LWT"
-  payload_available: "Online"
-  payload_not_available: "offline"
-    
-# Christmas tasmota temperature
- 
-- platform: mqtt
-  name: "Downstairs Temp"
-  state_topic: "tele/Christmas/SENSOR"
-  unit_of_measurement: '°C'
-  value_template: "{{ value_json['AM2301'].Temperature }}"
-  availability_topic: "tele/Christmas/LWT"
-  payload_available: "Online"
-  payload_not_available: "offline"
-    
-# Christmas tasmota humidity
-
-- platform: mqtt
-  name: "Downstairs Humidity"
-  state_topic: "tele/Christmas/SENSOR"
-  unit_of_measurement: '%'
-  value_template: "{{ value_json['AM2301'].Humidity }}"
-  availability_topic: "tele/Christmas/LWT"
-  payload_available: "Online"
-  payload_not_available: "offline"
-
-# Washer power
-
-- platform: mqtt
-  name: "Washer State"
-  state_topic: "hass/state/washer"
-  icon: mdi:washing-machine
-
-- platform: mqtt
-  name: "Washer Power"
-  state_topic: "tele/Washer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Power }}"
-  qos: 2
-  unit_of_measurement : "W"
-  icon: mdi:flash-circle
-  availability_topic: "tele/Washer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-
-- platform: mqtt
-  name: "Washer Voltage"
-  state_topic: "tele/Washer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Voltage }}"
-  qos: 2
-  unit_of_measurement : "V"
-  icon: mdi:flash-circle
-  availability_topic: "tele/Washer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-  
-- platform: mqtt
-  name: "Washer Amps"
-  state_topic: "tele/Washer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Current }}"
-  qos: 2
-  unit_of_measurement : "A"
-  icon: mdi:flash-circle
-  availability_topic: "tele/Washer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-   
-- platform: mqtt
-  name: "Washer Energy Today"
-  state_topic: "tele/Washer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Today }}"
-  qos: 2
-  unit_of_measurement : "kWh"
-  availability_topic: "tele/Washer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-      
-- platform: mqtt
-  name: "Washer Energy Yesterday"
-  state_topic: "tele/Washer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Yesterday }}"
-  qos: 2
-  unit_of_measurement : "kWh"
-  availability_topic: "tele/Washer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-
-- platform: mqtt
-  state_topic: "tele/Washer/STATE"
-  name: "Washer Signal"
-  unit_of_measurement: "%"
-  value_template: "{{value_json['Wifi'].RSSI }}"
-  availability_topic: "tele/Washer/LWT"
-  qos: 1
-  payload_available: "Online"
-  payload_not_available: "Offline"
-  
-- platform: mqtt
-  state_topic: "tele/Washer/SENSOR"
-  name: "Washer Apparent Power"
-  unit_of_measurement: "W"
-  value_template: "{{value_json['ENERGY'].ApparentPower }}"
-  availability_topic: "tele/Washer/LWT"
-  qos: 1
-  payload_available: "Online"
-  payload_not_available: "Offline"  
-  
-# Tumble dryer power
-
-- platform: mqtt
-  name: "Dryer State"
-  state_topic: "hass/state/dryer"
-  icon: mdi:washing-machine
-
-
-- platform: mqtt
-  name: "Dryer Power"
-  state_topic: "tele/dryer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Power }}"
-  qos: 2
-  unit_of_measurement : "W"
-  icon: mdi:flash-circle
-  availability_topic: "tele/dryer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-
-
-- platform: mqtt
-  name: "Dryer Voltage"
-  state_topic: "tele/dryer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Voltage }}"
-  qos: 2
-  unit_of_measurement : "V"
-  icon: mdi:flash-circle
-  availability_topic: "tele/dryer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-  
-
-- platform: mqtt
-  name: "Dryer Amps"
-  state_topic: "tele/dryer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Current }}"
-  qos: 2
-  unit_of_measurement : "A"
-  icon: mdi:flash-circle
-  availability_topic: "tele/dryer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-    
- 
-- platform: mqtt
-  name: "Dryer Energy Today"
-  state_topic: "tele/dryer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Today }}"
-  qos: 2
-  unit_of_measurement : "kWh"
-  availability_topic: "tele/dryer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-    
-  
-- platform: mqtt
-  name: "Dryer Energy Yesterday"
-  state_topic: "tele/dryer/SENSOR"
-  value_template: "{{value_json['ENERGY'].Yesterday }}"
-  qos: 2
-  unit_of_measurement : "kWh"
-  availability_topic: "tele/dryer/LWT"
-  payload_available: "Online"
-  payload_not_available: "Offline"
-
-
-- platform: mqtt
-  state_topic: "tele/dryer/STATE"
-  name: "Dryer Signal"
-  unit_of_measurement: "%"
-  value_template: "{{value_json['Wifi'].RSSI }}"
-  availability_topic: "tele/dryer/LWT"
-  qos: 1
-  payload_available: "Online"
-  payload_not_available: "Offline"
-  
-- platform: mqtt
-  state_topic: "tele/dryer/SENSOR"
-  name: "Dryer Apparent Power"
-  unit_of_measurement: "W"
-  value_template: "{{value_json['ENERGY'].ApparentPower }}"
-  availability_topic: "tele/dryer/LWT"
-  qos: 1
-  payload_available: "Online"
-  payload_not_available: "Offline"  
-# Uk Transport
-
-
-- platform: uk_transport
-  app_id: 88ca6b74
-  app_key: 258682558913e07176b986d2288fcf60
-  queries:
-    - mode: bus
-      origin: 3100Z199842
-      destination: Newcastle
-        
- 
-- platform: template
-  sensors:
-#    next_bus_route:
-#      friendly_name: "Next bus route"
-#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].route}}"
-#    next_bus_direction:
-#      friendly_name: "Next bus direction"
-#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].direction}}"
-#    next_bus_scheduled:
-#      friendly_name: "Next bus scheduled"
-#      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].scheduled}}"
-#    next_bus_estimated:
-#      friendly_name: "Next bus estimated"
-#      value_template: "{{states.sensor.next_bus_to_Newcastle.attributes.next_buses[0].estimated}}"
-
-    next_bus_route:
-      friendly_name: "Next bus route"
-      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].route}}"
-    next_bus_direction:
-      friendly_name: "Next bus direction"
-      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].direction}}"
-    next_bus_scheduled:
-      friendly_name: "Next bus scheduled"
-      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].scheduled}}"
-    next_bus_estimated:
-      friendly_name: "Next bus estimated"
-      value_template: "{{state_attr('sensor.next_bus_to_Newcastle', 'next_buses')[0].estimated}}"
-# Octopi Time in Hrs and minutes
-
-
-- platform: waze_travel_time
-#  sensor:
-  origin: 55.153073, -1.692775
-  destination: 55.079867, -1.590591
-  region: 'EU'
-  name: "Abbi to work"

@@ -1,26 +1,28 @@
-# Get state of all sonoffs on startup
+#
+### Get state of all Tasmota on startup
+#
 - alias: 'Power state on HA start-up'
-  hide_entity: false
+  #
   trigger:
     platform: homeassistant
     event: start
   action:
     - service: mqtt.publish
       data:
-        topic: "cmnd/sonoffs/state"
+        topic: "cmnd/tasmota/state"
         payload: ""
 #        
 ### Christmas Switch on
 #
-
-# Switch on Christmas tree lights at sunset
-- alias: 'Christmas Tree Lights'
+# Switch on lights at sunset
+- alias: 'Christmas on'
   trigger:
     platform: sun
     event: sunset
   action:
     - service: switch.turn_on
-      entity_id: switch.christmas_2
+      entity_id: switch.christmashouse
+      
       
 #Switch on outside christmas tree lights at sunset
 - alias: 'Outside Christmas Tree Lights'
@@ -29,7 +31,7 @@
     event: sunset
   action:
     - service: switch.turn_on
-      entity_id: switch.shireoutfront
+      entity_id: switch.christmastree
 #Switch on Christmas Candles at sunset
 - alias: 'Christmas Candles'
   trigger:
@@ -38,10 +40,71 @@
   action:
     - service: switch.turn_on
       entity_id: switch.christmascandles
+      
+#Switch on outside christmas house at sunset
+#- alias: 'Outside Christmas House Lights On'
+#  #
+#  trigger:
+#    platform: sun
+#    event: sunset
+#  action:
+#    - service: switch.turn_on
+#      entity_id: switch.ChristmasHouse
+    
+#Switch off outside christmas house at midnight
+- alias: 'Outside Christmas House Lights Off'
+  trigger:
+    platform: time
+    # Military time format. This trigger will fire at 11.59 PM
+    at: "23:59:59"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.christmashouse
+#
+### turn Bathroom Tradfri lights on when door closed active 1 hour before sunset or raining
+#
+- alias: 'Bathroom Light on'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.bathroom_door
+    from: 'on'
+    to: 'off'
+  condition:
+    condition: or
+    conditions:
+      - condition: sun
+        after: 'sunset'
+        after_offset: "-1:00:00"
+      - condition: state
+        entity_id: sensor.dark_sky_precip
+        state: 'rain'
+  action:
+    service: light.turn_on
+    entity_id: group.bathroom
 
+- alias: 'Bathroom Light off'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.bathroom_door
+    from: 'off'
+    to: 'on'
+  condition:
+    condition: or
+    conditions:
+      - condition: sun
+        after: 'sunset'
+        after_offset: "-1:00:00"
+      - condition: state
+        entity_id: sensor.dark_sky_precip
+        state: 'rain'
+  action:
+    service: light.turn_off
+    entity_id: group.bathroom         
+#
 ### turn Hall light sonoff on when door opened active from 1 hour before sunset or raining
+#
 - alias: 'Hall Light on'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
@@ -62,7 +125,7 @@
       
 ### turn Hall light sonoff off when door has been shut for a total of 5 minutes
 - alias: 'Hall Light off'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_3
@@ -78,7 +141,7 @@
 #
 # Loft light on when loft hatch opens triggering zwave sensor
 - alias: 'Loft Light on'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
@@ -86,10 +149,10 @@
       to: '22'
   action:
     - service: light.turn_on
-      entity_id: light.loft_light
+      entity_id: light.loft
 # Loft light off when loft hatch closes triggering zwave sensor   
 - alias: 'Loft Light off'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_2
@@ -97,13 +160,13 @@
       to: '23'
   action:
     - service: light.turn_off
-      entity_id: light.loft_light
+      entity_id: light.loft
 #
 ### Garage Strip Light
 #
 # Garage Strip light on when garage internal door opens triggering zwave sensor
 - alias: 'Garage on'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
@@ -114,7 +177,7 @@
       entity_id: group.garage
 # Garage strip light off when internal Garage door closes triggering zwave sensor   
 - alias: 'Garage Off'
-  hide_entity: False
+  #
   trigger:
     - platform: state
       entity_id: sensor.heiman_door_sensor_hs1dsz_access_control_4
@@ -126,32 +189,82 @@
 #
 ### Kitchen undercupboard lights triggered by zwave pir sensor
 #
-- alias: 'Kitchen Light off'
-  hide_entity: False
+#- alias: 'Kitchen Light off'
+  #
+#  trigger:
+#    - platform: state
+#      entity_id: sensor.kitchenpir_burglar
+#      from: '8'
+#      to: '0'
+#      for:
+#        minutes: 4
+#  condition:
+#    condition: and
+#    conditions:
+#      - condition: numeric_state
+#        entity_id: sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_burglar_2
+#        below: 4
+#  action:
+#    - service: light.turn_off
+#      entity_id: group.kitchen
+      
+      #
+### Kitchen undercupboard lights triggered by zwave pir sensor
+#
+#- alias: 'Kitchen Light off'
+  #
+#  trigger:
+#    - platform: state
+#      entity_id: sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_burglar_2
+#      from: '8'
+ #     to: '0'
+#      for:
+#        minutes: 2
+#  condition:
+#    condition: and
+#    conditions:
+#      - condition: numeric_state
+#        entity_id: sensor.kitchenpir_burglar
+#        below: 4
+#  action:
+#    - service: light.turn_off
+#      entity_id: group.kitchen
+      
+### Kitchen undercupboard lights triggered by zwave pir sensor
+#
+- alias: 'Kitchen Light off2'
+  #
   trigger:
     - platform: state
-      entity_id: sensor.kitchenpir_burglar
-      from: '8'
-      to: '0'
+      entity_id: binary_sensor.sensor_5
+      to: 'off'
       for:
-        minutes: 3 
+        minutes: 5
+#  condition:
+#    condition: and
+#    conditions:
+#      - condition: numeric_state
+#        entity_id: sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_burglar_2
+#        below: 4
   action:
     - service: light.turn_off
       entity_id: group.kitchen
-# Kitchen under cupboard lights on if zwave PIR triggered after sunset or raining 
-- alias: 'Kitchen Light on motion if PIR trigger 1 hr before sunset or raining, not active at night'
-  hide_entity: False
+      
+# Kitchen under cupboard lights on if zwave PIR triggered after sunset or raining or light below 150 lux
+
+
+- alias: 'Kitchen Light on motion if PIR1 triggered 1 hr before sunset or raining, not active at night'
+  #
   trigger:
     - platform: state
-      entity_id: sensor.kitchenpir_burglar
-      from: '0'
-      to: '8'
+      entity_id: binary_sensor.sensor_5
+      to: 'on'
   condition:
     condition: and
     conditions:
       - condition: time
         after: '07:00:00'
-        before: '00:30:00'
+        before: '06:59:00'
       - condition: or
         conditions:
           - condition: sun
@@ -160,13 +273,139 @@
           - condition: state
             entity_id: sensor.dark_sky_precip
             state: 'rain'
+          - condition: numeric_state
+            entity_id: sensor.orchid_light_intensity
+            below: 280
   action:
     - service: light.turn_on
       entity_id: group.kitchen
+      
+- alias: 'Kitchen Light on motion if Second PIR trigger 1 hr before sunset or raining, not active at night'
+  #
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_sensor_2
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '07:00:00'
+        before: '06:59:00'
+      - condition: or
+        conditions:
+          - condition: sun
+            after: 'sunset'
+            after_offset: "-01:00:00"
+          - condition: state
+            entity_id: sensor.dark_sky_precip
+            state: 'rain'
+          - condition: numeric_state
+            entity_id: sensor.orchid_light_intensity
+            below: 280
+  action:
+    - service: light.turn_on
+      entity_id: group.kitchen
+      
+# Kitchen Exraction on if humidity in hood above 60 during waking hours when
+- alias: 'Extraction on cooker humidity, not active at night'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.cooker_hood_humidity
+      above: 60
+      for:
+        seconds: 5
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '09:00:00'
+        before: '23:30:00'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.extraction
+      
+# Kitchen Exraction off if humidity in hood below 60 during waking hours when
+- alias: 'Extraction on cooker humidity, not active at night'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.cooker_hood_humidity
+      below: 60
+      for:
+        seconds: 60
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '09:00:00'
+        before: '23:30:00'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.extraction   
+      
+#
+### Announce high humidity in bedroom
+#
+- alias: 'Bedroom Humidity'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.bedroom_humidity
+      above: 65
+      for:
+        minutes: 10
+  condition:
+    - condition: time
+      after: '09:00:00'
+      before: '23:00:00'
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.kitchen
+          - media_player.office_2
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Bedroom Humidity HIGH consider opening window"
 
+#
+### Announce high humidity downstairs
+#
+- alias: 'Downstairs Humidity'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.downstairs_humidity
+      above: 60
+      for:
+        minutes: 10
+  condition:
+    - condition: time
+      after: '09:00:00'
+      before: '23:00:00'
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.kitchen
+          - media_player.office_2
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Humidity in living room high consider opening window"      
+  
 ### Notify when Lime tree needs water
 #- alias: 'Lime needs water'
-#  hide_entity: false
+#  
 #  trigger:
 #    - platform: numeric_state
 #      entity_id: sensor.lime_moisture
@@ -181,12 +420,11 @@
 
 ###Actions when Abbi leaves work
 - alias: 'Abbi Leaves Work'
-  hide_entity: false
   trigger:
     - platform: state
-      entity_id: device_tracker.abbiios
+      entity_id: device_tracker.iphone_2
       from: 'AbbiWork'
-      # Optional
+      #Optional
       #to: 'Away'
   condition:
     - condition: time
@@ -212,7 +450,7 @@
         data:
           type: announce
         target:
-          - media_player.office
+          - media_player.office_2
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
@@ -232,7 +470,7 @@
         data:
           type: announce
         target:
-          - media_player.office
+          - media_player.office_2
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
@@ -247,11 +485,10 @@
 #  Washing Machine Start/Finish
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 - alias: 'Washer State - Start'
-  hide_entity: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.washer_power
-      above: 10
+      above: 80
       for:
         seconds: 20
 # Make sure washer isn't already running and delaying between cycles - don't re-trigger and cause stopwatch reset
@@ -265,7 +502,6 @@
       payload: 'Washing'
       retain: 'true'
 - alias: 'Washer State - Idle'
-  hide_entity: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.washer_power
@@ -290,46 +526,18 @@
     condition: time
     after: '09:00:00'
     before: '22:30:00'
-  
-#    condition: template
-#    value_template: "{{ states.sensor.dryer_state.state != 'Drying' }}"
-#  action:
-#    - service: media_player.volume_set
-#      data:
-#        entity_id:
-#          - media_player.office_speaker
-#        volume_level: '0.75'
-# Play to google home
-#        - service: tts.google_say
-#      entity_id:
-#        - media_player.office_speaker
-#      data_template:
-#        message: "Laundry in the washing machine is done!"
-#
-#    - service: notify.ios_iosIH
-#      data:
-#        title: "Smart Home Alerts"
-#        message: "It's ready for you!"
-#        data:
-#          subtitle: "Washing Machine has finished"
-#    - service: notify.ios_abbiios
-#      data:
-#        title: "Smart Home Alerts"
-#        message: "It's ready for you!"
-#        data:
-#          subtitle: "Washing Machine has finished"
   action:
     - service: notify.alexa_media
       data:
-        data:
-          type: announce
         target:
-          - media_player.office
+          - media_player.office_2
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
           - media_player.downstairs
           - media_player.bedroom
+        data:
+          type: announce
         message: "Laundry in the washing machine is done."
    
 
@@ -338,7 +546,6 @@
 #  Dryer Start/Finish
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 - alias: 'Dryer State - Start'
-  hide_entity: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.dryer_power
@@ -356,7 +563,7 @@
       payload: 'Drying'
       retain: 'true'
 - alias: 'Dryer State - Idle'
-  hide_entity: false
+  #
   trigger:
     - platform: numeric_state
       entity_id: sensor.dryer_power
@@ -387,17 +594,17 @@
         data:
           type: announce
         target:
-          - media_player.office
+          - media_player.office_2
           - media_player.kitchen
           - media_player.garage
           - media_player.downstairs
           - media_player.bedroom
         message: "Tumble dryer has stopped, please check if it has finished or needs emptying"
 
-## Shire 3D print finished
+#
+# Shire 3D print finished
 #
 - alias: '3D print Finished'
-  hide_entity: false
   trigger:
     - platform: state
       entity_id: sensor.shire3d_current_state
@@ -426,11 +633,363 @@
         data:
           type: announce
         target:
-          - media_player.office
+          - media_player.office_2
           - media_player.kitchen
           - media_player.barney
           - media_player.garage
           - media_player.downstairs
           - media_player.bedroom
         message: "3D printer is finished."
-  
+#
+### Utility room lights on Utility PIR motion
+# 
+# turn Utility light tasmota (192.168.10.239) on when motion from 1 hour before sunset or raining
+#
+- alias: 'Utility Room Front Light on'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_sensor
+      from: 'off'
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '09:00:00'
+        before: '23:59:00'
+      - condition: or
+        conditions:
+          - condition: sun
+            after: 'sunset'
+            after_offset: "-01:00:00"
+          - condition: state
+            entity_id: sensor.dark_sky_precip
+            state: 'rain'
+          - condition: numeric_state
+            entity_id: sensor.downstairplant_light_intensity
+            below: 160
+  action:
+    - service: light.turn_on
+      entity_id: group.Utility
+
+#
+# turn Utility light tasmota (192.168.10.239) off when no motion for 1 minutes
+#
+- alias: 'Utility Room Front Light off'
+  #
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.shenzhen_neo_electronics_co_ltd_battery_powered_pir_sensor_v2_sensor
+      from: 'on'
+      to: 'off'
+      for:
+        minutes: 1
+  action:
+    - service: light.turn_off
+      entity_id: group.Utility
+#
+### Announce overtemperature in Kitchen and then add notification to phones
+#
+
+- alias: 'Kitchen Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.kitchen_main_temp
+      above: 30
+      for:
+        seconds: 10
+    - platform: numeric_state
+      entity_id: sensor.orchid_temperature
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Kitchen temperature is HIGH. please check."
+#
+### Announce overtemperature in Utility and then add notification to phones
+#
+- alias: 'Utility Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.utility_temp
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Utility Room temperature is HIGH. please check."    
+#
+### Announce overtemperature in Office and then add notification to phones
+#
+- alias: 'Office Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.officetemp
+      above: 30
+      for:
+        seconds: 10
+    - platform: numeric_state
+      entity_id: sensor.lime_temperature
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Office temperature is HIGH. please check."
+#
+### Announce overtemperature in Living room (TRV and sonoff sensor)
+#
+- alias: 'Living room Front Temperature High'
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.loungetemp
+      above: 30
+      for:
+        seconds: 10
+    - platform: numeric_state
+      entity_id: sensor.downstairs_temp
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Living Room temperature is HIGH. please check."   #
+#
+### Bedroom Over temperature
+#
+- alias: 'Bedroom (TRV) Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.bedroom_temp
+      above: 30
+      for:
+        seconds: 10
+    - platform: numeric_state
+      entity_id: sensor.bedroomtemp
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Bedroom Room temperature is HIGH. please check."    
+#
+### Announce overtemperature in Barney's room and then add notification to phones
+#
+- alias: 'Barney Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.barneytemp
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Barney Room temperature is HIGH. please check."    
+#
+### Announce overtemperature in Hall and then add notification to phones
+#
+- alias: 'Hall Temperature High'
+  #
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.halltemp
+      above: 30
+      for:
+        seconds: 10
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Hall temperature is HIGH. please check." 
+        
+#
+# Freezer alarm
+#
+- alias: 'Freezer Open for more than 5 minute'
+  #
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.shenzhen_neo_electronics_co_ltd_door_window_detector_sensor
+      from: 'off'
+      to: 'on'
+      for:
+        minutes: 5
+  condition:
+    - condition: time
+      after: '09:00:00'
+      before: '23:59:00'
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.office_2
+          - media_player.kitchen
+          - media_player.barney
+          - media_player.garage
+          - media_player.downstairs
+          - media_player.bedroom
+        data:
+          type: announce
+        message: "Freezer is open, please check."
+#
+#
+### Office light triggered by Hive motion sensor off
+#
+- alias: 'Office Light off'
+  #
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_1
+      from: 'on'
+      to: 'off'
+      for:
+        minutes: 5
+  action:
+    - service: light.turn_off
+      entity_id: light.office
+# Office light triggered by Hive motion sensor on -ADD LUX
+- alias: 'Office Light on motion if PIR trigger 1 hr before sunset or raining, not active at night'
+  #
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_1
+      from: 'off'
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '09:00:00'
+        before: '23:59:00'
+      - condition: or
+        conditions:
+          - condition: sun
+            after: 'sunset'
+            after_offset: "-01:00:00"
+          - condition: state
+            entity_id: sensor.dark_sky_precip
+            state: 'rain'
+          - condition: numeric_state
+            entity_id: sensor.downstairplant_light_intensity
+            below: 100
+  action:
+    - service: light.turn_on
+      entity_id: light.office
+#
+#
+#
+#live sensor
+#
+- alias: "Alexa Report"
+  trigger:
+  - platform: state
+    entity_id: light.alexa_virtual
+    to: 'on'
+  action:
+    - service: alexa_media.update_last_called  #this will force update the last Alexa attribute used by the sensor
+    - delay: 00:00:01  # you may need to increase this value if you dont get the response on the echo you asked the question
+    - service: notify.alexa_media
+      data_template:
+        target: 
+          - '{{ states.sensor.last_alexa.state }}' 
+        data:
+          type: tts
+        #message: 'it is {{ states("sensor.dark_sky_temperature") }} degrees. Abbi is at {{ states("sensor.geocoded_location") }} and if you glance to the right you can see her fabulous boobs'
+        message: >-
+          {% if (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 1  %}
+            Abbi is at {{ states('sensor.geocoded_location') }} 
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 2 %}
+             The radiator temperatures are  {{ states('sensor.loungetemp') }} downstairs, {{ states('sensor.officetemp') }} in the office, {{ states('sensor.bedroomtemp') }} in the bedroom and {{ states('sensor.barneytemp') }} in Barney's room
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 3 %}
+            The next bus to Newcastle is the {{ states('sensor.next_bus_route') }} due in {{ states('sensor.next_bus_to_newcastle') }} minutes and currently estimated to arrive at {{ states('sensor.next_bus_estimated') }}
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 4 %}
+            Abbi, currently your journey to work will take {{ states('sensor.abbi_to_work') }} minutes
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 5 %}
+            Iain you have enough fuel to drive {{ states('sensor.milesleft') }} miles
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 6 %}
+            Words.  What you want to say {{ states('sensor.name_of_sensor') }} follow on informtion
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 7 %}
+            Words.  What you want to say {{ states('sensor.name_of_sensor') }} follow on informtionabbi
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 9 %}
+            Words.  What you want to say {{ states('sensor.name_of_sensor') }} follow on informtion
+          {% elif (states.light.alexa_virtual.attributes.brightness | int / 255 * 100 ) | round  == 10 %}
+            Words.  What you want to say {{ states('sensor.name_of_sensor') }} follow on informtion
+          {% else %}
+           {{ states('light.alexa_virtual.attributes.brightness') }}
+          {% endif %}
+    - service: light.turn_off
+      entity_id: light.alexa_virtual

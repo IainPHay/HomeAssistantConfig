@@ -34,7 +34,7 @@ sensor.heiman_door_sensor_hs1dsz_burglar_2:
 sensor.door_sourcenodeid_2:
   hidden: true
 sensor.420d_mileage:
-  unit_of_measurement: m
+  unit_of_measurement: km
 sensor.barney_dimmer:
   hidden: true
 sensor.bedrooom_dimmer:
@@ -108,3 +108,19 @@ media_player.lounge:
   hidden: true
 sensor.dryer_state:
   icon: mdi:tumble-dryer
+sensor.milesleft:
+  icon: mdi:map-marker-distance
+sensor.mileage:
+  icon: mdi:speedometer
+sensor.bmwoillife:
+  icon: mdi:oil
+sensor.carhealthcheck:
+  icon: mdi:map-marker-distance
+sensor.bthubkbrcvd:
+  icon: mdi:download-network
+sensor.bthubkbsent:
+  icon: mdi:upload-network
+sensor.3dprinthoursleft:
+  icon: mdi:clock-end
+sensor.pressure:
+  icon: mdi:gauge

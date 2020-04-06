@@ -1,0 +1,51 @@
+esphome:
+  name: bediain
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: "TheShire"
+  password: "bigbigboobsamherst562589"
+  manual_ip:
+    static_ip: 192.168.10.199
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+mqtt:
+  broker: 192.168.10.31
+  username: "iain"
+  password: "jupiter562589"
+captive_portal:
+
+# Enable logging
+#logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+binary_sensor:
+  - platform: status
+    name: "Iain Bed Sensor Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "Iain Bed Sensor WiFi Signal"
+    update_interval: 3s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 15
+
+  - platform: adc
+    pin: A0
+    name: "Iain Bed Sensor"
+    update_interval: 3s
+    filters:
+      - multiply: 3.25 
+      - sliding_window_moving_average:
+          window_size: 10
+          send_every: 10 # 10 second updates @ 1 second scan interval.
+          send_first_at: 10
